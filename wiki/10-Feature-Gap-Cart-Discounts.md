@@ -1,0 +1,103 @@
+# Feature Gap: Cart Discounts
+
+## Problem Statement
+
+Discounts (from Pricing Rules, Coupon Codes, etc.) are calculated on the Quotation backend but are NOT displayed to the customer in the shopping cart UI. Customers see only the final price without understanding what promotions are active or how much they're saving.
+
+## Current State
+
+### What the customer sees in the cart:
+- Item name, code, image
+- Quantity (editable)
+- Rate (final price per unit)
+- Amount (total for that line)
+- Net Total, Taxes, Grand Total
+- Coupon code badge (if applied)
+
+### What exists on the Quotation but is HIDDEN:
+- Original price (`price_list_rate`) before discount
+- Discount percentage (`discount_percentage`)
+- Per-item discount amount
+- Total savings
+- Which pricing rules are active
+- Additional discount on total (`discount_amount`, `additional_discount_percentage`)
+
+## Where the Fix Needs to Happen
+
+### 1. `cart_items.html` - Per-item discount display
+**Current:** Shows only `rate` and `amount`
+**Needed:** Show `price_list_rate` struck through when it differs from `rate`, plus discount badge
+
+```jinja
+{# Proposed addition to item_subtotal macro #}
+{% if item.price_list_rate and item.price_list_rate != item.rate %}
+    <span class="original-price text-muted" style="text-decoration: line-through;">
+        {{ item.get_formatted('price_list_rate') }}
+    </span>
+    <span class="discount-badge text-success">
+        -{{ item.discount_percentage }}%
+    </span>
+{% endif %}
+```
+
+### 2. `cart_payment_summary.html` - Savings total
+**Current:** Net Total, Taxes, Grand Total only
+**Needed:** Add "You Save" row
+
+The logic already exists in `order_taxes.html`:
+```jinja
+{% set tot_quotation_discount = [] %}
+{%- for item in doc.items -%}
+    {% if tot_quotation_discount.append(
+        ((item.price_list_rate * item.qty) * item.discount_percentage) / 100
+    ) %}{% endif %}
+{% endfor %}
+Savings: {{ tot_quotation_discount | sum }}
+```
+
+### 3. `cart_items_total.html` - Pre-discount subtotal
+**Current:** Shows `doc.total` only
+**Needed:** Optionally show original total and savings
+
+### 4. `cart_items_dropdown.html` - Navbar mini-cart
+**Current:** Shows `amount` only
+**Needed:** Strike-through price when discounted
+
+### 5. Quotation DocType Modifications
+To "better reflect discounts" per the requirements:
+- Consider adding a **child table or virtual field** that summarizes all active pricing rules per item
+- Add a "Discount Summary" section to the Quotation print format
+- Potentially add `total_savings` as a computed field on Quotation
+
+## No Backend Changes Needed
+
+All discount data is already computed by ERPNext's pricing engine during `apply_cart_settings()` -> `set_price_list_and_item_details()` -> `calculate_taxes_and_totals()`. This is purely a **frontend/template display issue**.
+
+## Files to Modify
+
+| File | Change |
+|------|--------|
+| `templates/includes/cart/cart_items.html` | Add original price, discount % display |
+| `templates/includes/cart/cart_payment_summary.html` | Add savings row, discount summary |
+| `templates/includes/cart/cart_items_total.html` | Add pre-discount total |
+| `templates/includes/cart/cart_items_dropdown.html` | Add strike-through price |
+| `public/scss/webshop_cart.scss` | Styles for discount badges, strike-through |
+
+## Edge Cases to Handle
+
+1. Free items (is_free_item=True) - already handled with "FREE" badge
+2. Items with no discount (price_list_rate == rate) - no change needed
+3. Additional discount on total (doc.discount_amount) - show separately
+4. Multiple pricing rules per item - show highest or combined
+5. Margin-based pricing - rate_with_margin field
+
+---
+
+## Related Wiki Pages
+
+- [03 - Shopping Cart & Quotation Deep Dive](03-Shopping-Cart-Quotation-Deep-Dive.md) - Full field-by-field mapping of what the cart shows vs hides
+- [06 - Pricing & Discounts](06-Pricing-and-Discounts.md) - How discounts are calculated but not displayed
+- [13 - Discount Visibility & Urgency](13-Discount-Visibility-and-Urgency.md) - UI specifications and mockups
+- [14 - Hypothesis: Discount & Deadline Visibility](14-Hypothesis-Discount-Deadline-Visibility.md) - Exact implementation plan with code, formulas, and risk assessment
+- [12 - Staging Sandbox](12-Staging-Sandbox-Deployment.md) - Testing environment where this will be implemented (Phase 1 clone)
+- [Back to Home](00-Home.md)
