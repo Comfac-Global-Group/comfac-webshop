@@ -1,0 +1,79 @@
+= 05 - Variant Selector =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Previous:''' [Webshop-04-Product-Pages-and-Browsing 04 - Product Pages & Browsing]  
+'''Next:''' [Webshop-06-Pricing-and-Discounts 06 - Pricing & Discounts]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/05-Variant-Selector Comfac Webshop Wiki - Chapter 05]
+
+----
+
+== How Variants Work in ERPNext + Webshop ==
+
+ERPNext has a built-in '''Item Variant''' system:
+
+- '''Template Item''': defines attributes (e.g., Color, Size, RAM, Storage)
+- '''Variant Items''': concrete products with specific attribute values (e.g., "Laptop - 16GB RAM - 512GB SSD")
+
+The webshop uses this to create a step-by-step configurator on product pages.
+
+== Key Files ==
+
+- <code>webshop/variant_selector/utils.py</code> - Core variant logic
+- <code>webshop/variant_selector/item_variants_cache.py</code> - Redis caching layer
+- <code>templates/generators/item/item_configure.html</code> - Configurator UI
+- <code>templates/generators/item/item_configure.js</code> - Configurator JS
+
+== Variant Selection Flow ==
+
+1. User visits a Template Item page (has_variants=True)
+2. <code>item_configure.html</code> renders attribute dropdowns
+3. <code>item_configure.js</code> calls <code>get_next_attribute_and_values</code> API on each selection
+4. Backend filters valid combinations, returns:
+   - <code>next_attribute</code> - which attribute to select next
+   - <code>valid_options_for_attributes</code> - valid values given current selections
+   - <code>filtered_items_count</code> - how many variants match
+   - <code>exact_match</code> - if one variant is fully selected
+   - <code>product_info</code> - price for the matched variant
+   - <code>available_qty</code> - stock quantity
+5. When exact match found, "Add to Cart" button appears with variant item_code
+
+== Cache System (<code>ItemVariantsCacheManager</code>) ==
+
+Uses Redis to cache:
+
+- <code>item_variants_data</code> - all variant attribute values
+- <code>item_attribute_value_map</code> - attribute -> variant mapping
+- <code>optional_attributes</code> - which attributes are optional
+
+Cache is invalidated on Item save/rename via crud_events hooks.
+
+== API Endpoints ==
+
+=== <code>get_attributes_and_values(item_code)</code> ===
+
+Returns all attributes and their possible values for a template item.
+
+=== <code>get_next_attribute_and_values(item_code, selected_attributes)</code> ===
+
+Progressive filtering - returns valid options given current selections.
+
+=== <code>get_item_variant_price_dict(item_code, cart_settings)</code> ===
+
+Gets price for a specific variant item.
+
+== Relevance to System Builder ==
+
+The existing variant selector is a '''single-item configurator'''. The planned System Builder would need:
+
+- '''Multi-item configuration''' (CPU + RAM + Storage + etc.)
+- '''Cross-item compatibility rules''' (not just attribute filtering within one template)
+- '''Template/preset system''' (save configurations)
+- '''Aggregated pricing''' (total system price with combined discounts)
+
+The variant_selector's caching and attribute filtering logic could be extended, but the System Builder is fundamentally a different scope.
+
+----
+
+'''See Also:''' [Webshop-11-Feature-Plan-System-Builder Feature Plan: System Builder]
+
+'''Navigation:''' [Webshop-Index Webshop Index] | [Webshop-04-Product-Pages-and-Browsing Previous: 04 - Product Pages] | [Webshop-06-Pricing-and-Discounts Next: 06 - Pricing & Discounts]

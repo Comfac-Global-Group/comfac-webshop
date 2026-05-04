@@ -1,0 +1,401 @@
+= 14 - Hypothesis: Making Discounts and Deadlines Visible =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Previous:''' [Webshop-13-Discount-Visibility-and-Urgency 13 - Discount Visibility & Urgency]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/14-Hypothesis-Discount-Deadline-Visibility Comfac Webshop Wiki - Chapter 14]
+
+----
+
+== Prerequisite: Seamless Baseline First ==
+
+'''This hypothesis is NOT to be executed until the comfac-webshop fork runs seamlessly as a drop-in replacement on a production-like ERPNext instance.'''
+
+'''Execution order:'''
+
+1. '''Phase 0 (Staging Sandbox):''' Clone the production ERPNext instance, install comfac-webshop, validate it works identically to the existing webshop. No feature changes. Pass all validation checks.
+
+2. '''Phase 1 (Experiment Clone):''' Once Phase 0 is proven stable, clone THAT successful staging instance into a second sandbox. This is where we implement and test the hypothesis below.
+
+3. '''Phase 2 (Iterate):''' Test with sample products, pricing rules, coupons, and deadline-bearing offers on the experiment clone. Validate every scenario. Only when everything passes do we merge back to the main fork.
+
+'''Do not skip Phase 0.'''
+
+== Core Thesis ==
+
+'''All the data we need already exists on the Quotation document.''' ERPNext's pricing engine populates discount fields on every cart save. We do not need to change the backend calculation logic. We need to:
+
+1. '''Surface existing hidden fields''' in the cart templates
+2. '''Enrich the decorator''' to pass pricing rule metadata (deadlines, titles) to the frontend
+3. '''Add summation logic''' in the payment summary template
+4. '''Style it''' so customers immediately see value and urgency
+
+== Part 1: The Fields We Will Target ==
+
+=== Per-Item Fields (Quotation Item - already populated) ===
+
+{| class="wikitable"
+|-
+| Field
+| Type
+| What It Contains
+| Currently Used?
+|}
+|---------|--------|------------------------|----------------------|
+{| class="wikitable"
+|-
+| <code>price_list_rate</code>
+| Currency
+| Original unit price from the Price List (before any discount)
+| '''NO'''
+|-
+| <code>rate</code>
+| Currency
+| Final unit price (after discount applied)
+| YES
+|-
+| <code>discount_percentage</code>
+| Percent
+| The % discount applied by the Pricing Rule
+| '''NO'''
+|-
+| <code>discount_amount</code>
+| Currency
+| Per-unit discount in currency
+| '''NO'''
+|-
+| <code>amount</code>
+| Currency
+| <code>rate * qty</code> = line total after discount
+| YES
+|-
+| <code>is_free_item</code>
+| Check
+| True if item was added by a "Free Item" pricing rule
+| YES
+|-
+| <code>pricing_rules</code>
+| Small Text
+| '''JSON string''' of Pricing Rule document names
+| '''NO'''
+|}
+
+=== Document-Level Fields (Quotation - already populated) ===
+
+{| class="wikitable"
+|-
+| Field
+| Type
+| What It Contains
+| Currently Used?
+|}
+|---------|--------|------------------------|----------------------|
+{| class="wikitable"
+|-
+| <code>total</code>
+| Currency
+| Sum of all <code>amount</code> values (item totals before tax)
+| YES
+|-
+| <code>net_total</code>
+| Currency
+| Total after additional discounts
+| YES
+|-
+| <code>grand_total</code>
+| Currency
+| Final total with taxes
+| YES
+|-
+| <code>discount_amount</code>
+| Currency
+| Additional discount on the overall total
+| '''NO'''
+|-
+| <code>additional_discount_percentage</code>
+| Percent
+| % discount on total
+| '''NO'''
+|-
+| <code>coupon_code</code>
+| Link
+| Applied Coupon Code document name
+| PARTIAL
+|}
+
+=== Pricing Rule Fields (need to be looked up from pricing_rules JSON) ===
+
+{| class="wikitable"
+|-
+| Field
+| Type
+| What It Contains
+| Purpose for Us
+|}
+|---------|--------|------------------------|---------------------|
+{| class="wikitable"
+|-
+| <code>title</code>
+| Data
+| Human-readable name (e.g., "Spring GPU Sale")
+| Display offer name
+|-
+| <code>valid_from</code>
+| Date
+| Start date of the offer
+| Show when offer started
+|-
+| <code>valid_upto</code>
+| Date
+| '''End date / DEADLINE''' of the offer
+| '''URGENCY DISPLAY'''
+|-
+| <code>discount_percentage</code>
+| Percent
+| The discount % this rule applies
+| Confirm which rule gave what discount
+|}
+
+== Part 2: The Summation System ==
+
+=== Improved Summation Formula ===
+
+<pre>python
+Per-item savings:
+    if item.is_free_item:
+        item_savings = item.price_list_rate * item.qty  (entire value is free)
+    elif item.price_list_rate and item.price_list_rate > item.rate:
+        item_savings = (item.price_list_rate - item.rate) * item.qty
+    else:
+        item_savings = 0
+
+total_item_savings = sum(item_savings for all items)
+
+Additional discount savings:
+    doc_discount = doc.discount_amount or 0
+
+Grand savings:
+    total_savings = total_item_savings + doc_discount
+<pre>
+
+== Part 3: The Deadline System ==
+
+=== Data Chain for Deadlines ===
+
+<pre>
+Pricing Rule (has valid_upto date)
+    ↓ applied during set_price_list_and_item_details()
+Quotation Item.pricing_rules = '["PRLE-0001", "PRLE-0002"]'  (JSON string)
+    ↓ we parse this in the decorator
+decorate_quotation_doc() enriches each item with:
+    d.offer_details = [
+        {"title": "Spring Sale", "valid_upto": "2026-03-01", "days_left": 10},
+        ...
+    ]
+    ↓ template renders deadline badges
+<pre>
+
+=== Backend Helper ===
+
+<pre>python
+def get_offer_details_for_item(item):
+    """Parse pricing_rules JSON and fetch deadline/title from each Pricing Rule."""
+    import json
+    offers = []
+    
+    if not item.pricing_rules:
+        return offers
+    
+    try:
+        rule_names = json.loads(item.pricing_rules)
+    except (json.JSONDecodeError, TypeError):
+        return offers
+    
+    for rule_name in rule_names:
+        rule = frappe.get_cached_doc("Pricing Rule", rule_name)
+        offer = {
+            "title": rule.title or rule.name,
+            "valid_upto": rule.valid_upto,
+            "days_left": None,
+        }
+        if rule.valid_upto:
+            from frappe.utils import date_diff, today
+            offer["days_left"] = date_diff(rule.valid_upto, today())
+        offers.append(offer)
+    
+    return offers
+<pre>
+
+== Part 4: File-by-File Change Map ==
+
+=== File 1: <code>webshop/webshop/shopping_cart/cart.py</code> ===
+
+'''Function:''' <code>decorate_quotation_doc()</code>
+
+'''Change:''' Add <code>offer_details</code> list to each item. Also compute and add <code>doc.original_total</code>, <code>doc.total_savings</code>, <code>doc.has_any_discount</code>.
+
+=== File 2: <code>templates/includes/cart/cart_items.html</code> ===
+
+'''Macro:''' <code>item_subtotal</code>
+
+'''Change:''' Add strike-through original price when discounted, discount percentage badge, "You save" amount, and offer deadline badges.
+
+=== File 3: <code>templates/includes/cart/cart_payment_summary.html</code> ===
+
+'''Change:''' Add original subtotal (struck through) if discounts exist, savings row, and additional discount row.
+
+=== File 4: <code>templates/includes/cart/cart_items_total.html</code> ===
+
+'''Change:''' Show original total (struck through) if <code>doc.has_any_discount</code>.
+
+=== File 5: <code>public/scss/webshop_cart.scss</code> ===
+
+'''Change:''' Add styles for discount badges, strikethrough, and urgency indicators.
+
+== Part 5: What We Do NOT Need to Change ==
+
+{| class="wikitable"
+|-
+| Component
+| Why No Change Needed
+|}
+|--------------|----------------------------|
+{| class="wikitable"
+|-
+| <code>set_price_list_and_rate()</code>
+| Already resets and repopulates fields on every save
+|-
+| <code>apply_cart_settings()</code>
+| Already calls <code>calculate_taxes_and_totals()</code> which does all the math
+|-
+| <code>update_cart()</code>
+| Already re-renders all three template fragments on AJAX update
+|-
+| ERPNext Pricing Rules
+| Standard feature - we just read the results
+|-
+| ERPNext Quotation DocType
+| All fields we need already exist
+|-
+| <code>shopping_cart.js</code>
+| AJAX update already replaces affected DOM elements
+|}
+
+== Part 6: Risk Assessment ==
+
+{| class="wikitable"
+|-
+| Risk
+| Likelihood
+| Mitigation
+|}
+|--------|----------------|----------------|
+{| class="wikitable"
+|-
+| <code>price_list_rate</code> is 0 or null
+| Medium
+| Guard with <code>{% if item.price_list_rate and item.price_list_rate > 0 %}</code>
+|-
+| <code>pricing_rules</code> JSON malformed
+| Low
+| Wrap in try/except, return empty list
+|-
+| Pricing Rule deleted but referenced
+| Low
+| Use <code>frappe.db.exists()</code> check
+|-
+| Performance hit from lookups
+| Low
+| <code>get_cached_doc()</code> uses Frappe cache
+|-
+| <code>discount_percentage</code> is 0 but <code>discount_amount</code> is set
+| Medium
+| Use <code>price_list_rate - rate</code> comparison
+|-
+| Free items with no <code>price_list_rate</code>
+| Medium
+| Skip savings calculation for these
+|-
+| Multiple pricing rules per item
+| Medium
+| Show all offer details; sum net savings
+|}
+
+== Part 7: Verification Checklist ==
+
+{| class="wikitable"
+|-
+| #
+| Scenario
+| Check
+|}
+|----|-------------|---------|
+{| class="wikitable"
+|-
+| 1
+| Item with percentage discount
+| Shows $100 → $80 (-20%), "You save $20"
+|-
+| 2
+| Item with amount discount
+| Shows $100 → $85, "You save $15"
+|-
+| 3
+| Item with no discount
+| Shows $100 only, no strikethrough
+|-
+| 4
+| Free item from pricing rule
+| Shows "FREE" badge, value in savings
+|-
+| 5
+| Coupon code applied
+| Savings row reflects coupon
+|-
+| 6
+| Offer expiring in 3 days
+| Red text "Only 3 days left!"
+|-
+| 7
+| Offer expiring in 10 days
+| Warning text "Offer ends March 1, 2026"
+|-
+| 8
+| Offer with no deadline
+| No deadline shown, discount visible
+|-
+| 9
+| Multiple offers on one item
+| All offer titles/deadlines listed
+|-
+| 10
+| Additional discount on total
+| "Additional Discount -$50" row
+|-
+| 11
+| Cart with mixed items
+| Only discounted items show strikethrough
+|-
+| 12
+| AJAX qty update
+| All discount info re-renders
+|-
+| 13
+| Mobile view
+| Discount badges readable
+|-
+| 14
+| <code>price_list_rate</code> is null
+| Falls back showing rate only
+|}
+
+== Summary ==
+
+'''What we're doing:''' Reading 4 hidden Quotation Item fields (<code>price_list_rate</code>, <code>discount_percentage</code>, <code>pricing_rules</code>, <code>is_free_item</code>) + 2 hidden Quotation fields (<code>discount_amount</code>, <code>additional_discount_percentage</code>) that ERPNext already populates, and displaying them in 4 template files + 1 Python decorator.
+
+'''What we're NOT doing:''' No new DocTypes, no pricing engine changes, no database migrations, no JS logic changes. The AJAX update cycle already re-renders all affected templates.
+
+'''Files touched:''' 5 total (1 Python, 3 HTML templates, 1 SCSS)
+
+----
+
+'''Navigation:''' [Webshop-Index Webshop Index] | [Webshop-13-Discount-Visibility-and-Urgency Previous: 13 - Discount Visibility] | [Webshop-Index Webshop Index]

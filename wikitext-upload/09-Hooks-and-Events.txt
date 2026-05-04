@@ -1,0 +1,98 @@
+= 09 - Hooks & Events =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Previous:''' [Webshop-08-Templates-and-Frontend 08 - Templates & Frontend]  
+'''Next:''' [Webshop-10-Feature-Gap-Cart-Discounts 10 - Feature Gap: Cart Discounts]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/09-Hooks-and-Events Comfac Webshop Wiki - Chapter 09]
+
+----
+
+== App Hooks (<code>webshop/hooks.py</code>) ==
+
+<pre>python
+= Installation =
+after_install = "webshop.setup.install.after_install"
+
+= Session Management =
+on_logout = "webshop.webshop.shopping_cart.utils.clear_cart_count"
+on_session_creation = [
+    "webshop.webshop.utils.portal.update_debtors_account",
+    "webshop.webshop.shopping_cart.utils.set_cart_count",
+]
+
+= Website Context =
+update_website_context = [
+    "webshop.webshop.shopping_cart.utils.update_website_context",
+]
+
+= DocType Overrides =
+override_doctype_class = {
+    "Payment Request": "webshop.webshop.doctype.override_doctype.payment_request.PaymentRequest",
+    "Item Group": "webshop.webshop.doctype.override_doctype.item_group.WebshopItemGroup",
+    "Item": "webshop.webshop.doctype.override_doctype.item.WebshopItem",
+}
+
+= DocType Events =
+doc_events = {
+    "Item": {
+        "on_update": [
+            "webshop.webshop.crud_events.item.update_website_item.execute",
+            "webshop.webshop.crud_events.item.invalidate_item_variants_cache.execute",
+        ],
+        "before_rename": [
+            "webshop.webshop.crud_events.item.validate_duplicate_website_item.execute",
+        ],
+        "after_rename": [
+            "webshop.webshop.crud_events.item.invalidate_item_variants_cache.execute",
+        ],
+    },
+    "Quotation": {
+        "validate": [
+            "webshop.webshop.crud_events.quotation.validate_shopping_cart_items.execute",
+        ],
+    },
+    "Price List": {
+        "validate": [
+            "webshop.webshop.crud_events.price_list.check_impact_on_cart.execute"
+        ],
+    },
+    "Tax Rule": {
+        "validate": [
+            "webshop.webshop.crud_events.tax_rule.validate_use_for_cart.execute",
+        ],
+    },
+}
+
+= Website Generators =
+website_generators = ["Website Item", "Item Group"]
+
+= Website Permissions =
+has_website_permission = {
+    "Website Item": "webshop.webshop.doctype.website_item.website_item.has_website_permission_for_website_item",
+    "Item Group": "webshop.webshop.doctype.website_item.website_item.has_website_permission_for_item_group"
+}
+<pre>
+
+== CRUD Events ==
+
+'''Item Events''' (<code>webshop/webshop/crud_events/item/</code>):
+
+- <code>update_website_item.execute</code> - Sync Item → Website Item
+- <code>invalidate_item_variants_cache.execute</code> - Clear variant cache on save/rename
+- <code>validate_duplicate_website_item.execute</code> - Prevent duplicate web items
+
+'''Quotation Events''' (<code>webshop/webshop/crud_events/quotation/</code>):
+
+- <code>validate_shopping_cart_items.execute</code> - Validate cart items on save
+
+'''Price List Events''' (<code>webshop/webshop/crud_events/price_list/</code>):
+
+- <code>check_impact_on_cart.execute</code> - Check if price list changes affect cart
+
+'''Tax Rule Events''' (<code>webshop/webshop/crud_events/tax_rule/</code>):
+
+- <code>validate_use_for_cart.execute</code> - Validate tax rules for cart usage
+
+----
+
+'''Navigation:''' [Webshop-Index Webshop Index] | [Webshop-08-Templates-and-Frontend Previous: 08 - Templates & Frontend] | [Webshop-10-Feature-Gap-Cart-Discounts Next: 10 - Feature Gap: Cart Discounts]

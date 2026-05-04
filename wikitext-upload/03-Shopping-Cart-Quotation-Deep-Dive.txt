@@ -1,0 +1,278 @@
+= 03 - Shopping Cart & Quotation Deep Dive =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Previous:''' [Webshop-02-DocTypes 02 - DocTypes]  
+'''Next:''' [Webshop-04-Product-Pages-and-Browsing 04 - Product Pages & Browsing]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/03-Shopping-Cart-Quotation-Deep-Dive Comfac Webshop Wiki - Chapter 03]
+
+----
+
+== How the Cart IS a Quotation ==
+
+The webshop has no separate "cart" data model. The shopping cart IS an ERPNext '''Quotation''' document with <code>order_type = "Shopping Cart"</code> and <code>docstatus = 0</code> (Draft).
+
+When a user visits <code>/cart</code>:
+
+<pre>
+cart.py (template controller)
+  -> get_cart_quotation()
+       -> _get_cart_quotation(party)  # finds or creates the Quotation
+       -> decorate_quotation_doc(doc) # adds web-specific fields (thumbnail, route, etc.)
+       -> returns { doc, shipping_addresses, billing_addresses, shipping_rules, cart_settings }
+<pre>
+
+The entire <code>doc</code> object passed to the Jinja templates IS the Quotation document.
+
+== Data Flow: Cart UI to Quotation ==
+
+=== Page Load Context ===
+
+The <code>/cart</code> page calls <code>get_cart_quotation()</code> which returns:
+
+{| class="wikitable"
+|-
+| Context Key
+| Source
+| Description
+|}
+|-----------------|----------|-----------------|
+{| class="wikitable"
+|-
+| <code>doc</code>
+| Quotation document
+| The full quotation with all fields
+|-
+| <code>doc.items</code>
+| Quotation Item child table
+| Line items in the cart
+|-
+| <code>cart_settings</code>
+| Webshop Settings
+| Controls what's shown (prices, checkout, etc.)
+|-
+| <code>shipping_addresses</code>
+| Customer's Address
+| Shipping address options
+|-
+| <code>billing_addresses</code>
+| Customer's Address
+| Billing address options
+|-
+| <code>shipping_rules</code>
+| Shipping Rule
+| Available shipping options
+|}
+
+=== Template Breakdown ===
+
+#### Cart Items Table (<code>cart_items.html</code>)
+
+'''File:''' <code>templates/includes/cart/cart_items.html</code>
+
+For each <code>d in doc.items</code> (Quotation Item), displays:
+
+{| class="wikitable"
+|-
+| Displayed
+| Quotation Item Field
+| Notes
+|}
+|--------------|----------------------------|---------|
+{| class="wikitable"
+|-
+| Product image
+| <code>d.thumbnail</code>
+| Added by decorator from Website Item
+|-
+| Item name
+| <code>d.web_item_name</code> or <code>d.item_name</code>
+| web_item_name added by decorator
+|-
+| Item code
+| <code>d.item_code</code>
+| Direct from Quotation Item
+|-
+| Quantity
+| <code>d.qty</code> (formatted)
+| Editable input
+|-
+| Subtotal
+| <code>d.amount</code> (formatted)
+| <code>item.get_formatted('amount')</code>
+|-
+| Rate
+| <code>d.rate</code> (formatted)
+| Only shown if NOT a free item
+|-
+| Free item badge
+| <code>d.is_free_item</code>
+| From pricing rules
+|}
+
+'''⚠️ CRITICAL GAP:''' Template does NOT show:
+- <code>d.price_list_rate</code> (original price before discount)
+- <code>d.discount_percentage</code> (the discount applied)
+- <code>d.discount_amount</code> (monetary discount)
+- <code>d.pricing_rules</code> (which pricing rules were applied)
+- Strike-through original price
+- Any "you save X%" messaging
+
+#### Cart Items Total (<code>cart_items_total.html</code>)
+
+'''File:''' <code>templates/includes/cart/cart_items_total.html</code>
+
+Shows only <code>doc.total</code> (Net Total). Does NOT show:
+- <code>doc.discount_amount</code> (additional discount on total)
+- <code>doc.additional_discount_percentage</code>
+- Any per-item discount breakdown
+
+#### Payment Summary (<code>cart_payment_summary.html</code>)
+
+'''File:''' <code>templates/includes/cart/cart_payment_summary.html</code>
+
+Shows Net Total, Taxes, Grand Total. Does NOT show:
+- <code>doc.discount_amount</code>
+- <code>doc.additional_discount_percentage</code>
+- Per-item discount_percentage
+- Per-item price_list_rate vs rate comparison
+- Coupon code display (commented out TODO in template)
+- Savings calculation
+
+== Hidden Fields (Exist but Not Used) ==
+
+=== Document Level ===
+
+{| class="wikitable"
+|-
+| Field
+| Type
+| Used?
+|}
+|---------|--------|---------|
+{| class="wikitable"
+|-
+| <code>total</code>
+| Currency
+| YES
+|-
+| <code>net_total</code>
+| Currency
+| YES
+|-
+| <code>grand_total</code>
+| Currency
+| YES
+|-
+| <code>total_qty</code>
+| Float
+| YES
+|-
+| <code>taxes</code>
+| Table
+| YES
+|-
+| <code>discount_amount</code>
+| Currency
+| '''NO'''
+|-
+| <code>additional_discount_percentage</code>
+| Percent
+| '''NO'''
+|-
+| <code>coupon_code</code>
+| Link
+| PARTIAL
+|}
+
+=== Item Level ===
+
+{| class="wikitable"
+|-
+| Field
+| Type
+| Used?
+|}
+|---------|--------|---------|
+{| class="wikitable"
+|-
+| <code>item_code</code>
+| Link
+| YES
+|-
+| <code>qty</code>
+| Float
+| YES
+|-
+| <code>rate</code>
+| Currency
+| YES
+|-
+| <code>amount</code>
+| Currency
+| YES
+|-
+| <code>price_list_rate</code>
+| Currency
+| '''NO'''
+|-
+| <code>discount_percentage</code>
+| Percent
+| '''NO'''
+|-
+| <code>discount_amount</code>
+| Currency
+| '''NO'''
+|-
+| <code>is_free_item</code>
+| Check
+| YES
+|-
+| <code>pricing_rules</code>
+| Small Text
+| '''NO'''
+|}
+
+== AJAX Update Cycle ==
+
+When a user changes quantity or removes an item:
+
+<pre>
+shopping_cart.shopping_cart_update({item_code, qty, additional_notes})
+  -> POST webshop.webshop.shopping_cart.cart.update_cart
+       -> with_items=1
+       -> Returns re-rendered HTML fragments:
+          {
+            items: rendered "cart_items.html",
+            total: rendered "cart_items_total.html",
+            taxes_and_totals: rendered "cart_payment_summary.html"
+          }
+  -> JS replaces DOM:
+       $(".cart-items").html(r.message.items)
+       $(".cart-tax-items").html(r.message.total)
+       $(".payment-summary").html(r.message.taxes_and_totals)
+<pre>
+
+The backend calls <code>apply_cart_settings()</code> before saving, which:
+1. Sets price list and recalculates rates
+2. Runs <code>calculate_taxes_and_totals</code> (where discounts are computed)
+3. Sets taxes from templates
+4. Applies shipping rules
+
+'''The discounts ARE being calculated on the backend.''' They just aren't rendered in the templates.
+
+== The Decorator Function ==
+
+<code>decorate_quotation_doc(doc)</code> in <code>cart.py</code> enriches each Quotation Item with:
+- <code>web_item_name</code>
+- <code>thumbnail</code>
+- <code>website_image</code>
+- <code>description</code>
+- <code>route</code>
+
+This decorator does NOT add any discount/pricing info - it only adds display metadata.
+
+----
+
+'''See Also:''' [Webshop-10-Feature-Gap-Cart-Discounts Feature Gap: Cart Discounts] for planned enhancements
+
+'''Navigation:''' [Webshop-Index Webshop Index] | [Webshop-02-DocTypes Previous: 02 - DocTypes] | [Webshop-04-Product-Pages-and-Browsing Next: 04 - Product Pages]

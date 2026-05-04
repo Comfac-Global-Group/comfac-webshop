@@ -1,0 +1,123 @@
+= 08 - Templates & Frontend =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Previous:''' [Webshop-07-Checkout-and-Orders 07 - Checkout & Orders]  
+'''Next:''' [Webshop-09-Hooks-and-Events 09 - Hooks & Events]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/08-Templates-and-Frontend Comfac Webshop Wiki - Chapter 08]
+
+----
+
+== Template Structure ==
+
+=== Pages (Full Page Templates) ===
+
+{| class="wikitable"
+|-
+| File
+| Route
+| Purpose
+|}
+|--------|---------|------------|
+{| class="wikitable"
+|-
+| <code>templates/pages/cart.html</code>
+| /cart
+| Shopping cart
+|-
+| <code>templates/pages/order.html</code>
+| /orders/{name}
+| Order details
+|-
+| <code>templates/pages/wishlist.html</code>
+| /wishlist
+| Wishlist
+|-
+| <code>templates/pages/product_search.html</code>
+| /products
+| Search results
+|-
+| <code>templates/pages/customer_reviews.html</code>
+| -
+| Review management
+|}
+
+=== Includes (Partial Templates) ===
+
+'''Cart Components''' (<code>templates/includes/cart/</code>):
+
+{| class="wikitable"
+|-
+| File
+| Purpose
+|}
+|--------|------------|
+{| class="wikitable"
+|-
+| <code>cart_items.html</code>
+| Cart line items table
+|-
+| <code>cart_items_total.html</code>
+| Subtotal display
+|-
+| <code>cart_payment_summary.html</code>
+| Taxes, grand total
+|-
+| <code>cart_items_dropdown.html</code>
+| Mini-cart in navbar
+|-
+| <code>cart_address.html</code>
+| Address selection
+|-
+| <code>place_order.html</code>
+| Order button
+|-
+| <code>coupon_code.html</code>
+| Coupon input
+|}
+
+== JavaScript Files ==
+
+{| class="wikitable"
+|-
+| File
+| Purpose
+|}
+|--------|------------|
+{| class="wikitable"
+|-
+| <code>public/js/shopping_cart.js</code>
+| Cart interactions, AJAX updates
+|-
+| <code>public/js/wishlist.js</code>
+| Wishlist add/remove
+|-
+| <code>public/js/customer_reviews.js</code>
+| Review submission
+|-
+| <code>templates/generators/item/item_configure.js</code>
+| Variant selector
+|-
+| <code>templates/includes/product_page.js</code>
+| Product page interactions
+|}
+
+== CSS/SCSS ==
+
+{| class="wikitable"
+|-
+| File
+| Purpose
+|}
+|--------|------------|
+{| class="wikitable"
+|-
+| <code>public/scss/webshop-web.bundle.css</code>
+| Main stylesheet
+|-
+| <code>public/scss/webshop_cart.scss</code>
+| Cart-specific styles
+|}
+
+----
+
+'''Navigation:''' [Webshop-Index Webshop Index] | [Webshop-07-Checkout-and-Orders Previous: 07 - Checkout & Orders] | [Webshop-09-Hooks-and-Events Next: 09 - Hooks & Events]

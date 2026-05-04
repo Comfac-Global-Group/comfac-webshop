@@ -1,0 +1,45 @@
+= 07 - Checkout & Orders =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Previous:''' [Webshop-06-Pricing-and-Discounts 06 - Pricing & Discounts]  
+'''Next:''' [Webshop-08-Templates-and-Frontend 08 - Templates & Frontend]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/07-Checkout-and-Orders Comfac Webshop Wiki - Chapter 07]
+
+----
+
+== Place Order Flow ==
+
+When user clicks "Place Order":
+
+<pre>
+1. cart.place_order() called
+2. Validations:
+   - Cart not empty
+   - Items in stock (if stock check enabled)
+   - Valid shipping/billing addresses
+3. Quotation.submit() - converts to Sales Order
+4. If payment required:
+   - Create Payment Request
+   - Redirect to payment gateway
+5. Order confirmation page
+<pre>
+
+== Order Pages ==
+
+'''Files:''' <code>templates/pages/order.html</code>, <code>order.js</code>, <code>order.py</code>
+
+- Shows order details, status, tracking
+- Payment status
+- Linked documents (Sales Order, Payment Entry)
+
+== Wishlist ==
+
+'''Files:''' <code>templates/pages/wishlist.html</code>, <code>wishlist.py</code>
+
+- User's saved items
+- Add to cart from wishlist
+- Remove items
+
+----
+
+'''Navigation:''' [Webshop-Index Webshop Index] | [Webshop-06-Pricing-and-Discounts Previous: 06 - Pricing & Discounts] | [Webshop-08-Templates-and-Frontend Next: 08 - Templates & Frontend]

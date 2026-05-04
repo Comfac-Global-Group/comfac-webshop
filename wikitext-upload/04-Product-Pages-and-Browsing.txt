@@ -1,0 +1,90 @@
+= 04 - Product Pages & Browsing =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Previous:''' [Webshop-03-Shopping-Cart-Quotation-Deep-Dive 03 - Shopping Cart & Quotation Deep Dive]  
+'''Next:''' [Webshop-05-Variant-Selector 05 - Variant Selector]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/04-Product-Pages-and-Browsing Comfac Webshop Wiki - Chapter 04]
+
+----
+
+== Product Listing Pages ==
+
+=== /all-products ===
+
+'''Files:''' <code>www/all-products/index.py</code>, <code>index.html</code>, <code>index.js</code>
+
+- Server-side: builds filter context from Webshop Settings
+- Client-side: JS calls <code>webshop.webshop.api.get_product_filter_data</code> API
+- Uses <code>ProductQuery</code> engine for filtered product search
+- Supports: search, field filters (item_group, brand), attribute filters (Color, Size), discount filters
+- Pagination via <code>products_per_page</code> setting
+
+=== /shop-by-category ===
+
+'''Files:''' <code>www/shop-by-category/index.py</code>, <code>index.html</code>, <code>index.js</code>
+
+- Renders category cards based on Webshop Settings filter_fields
+- Supports slideshow from Website Slideshow
+- Uses <code>category_card_section.html</code> template
+
+=== Item Group Pages (generated) ===
+
+'''File:''' <code>templates/generators/item_group.html</code>
+
+- Auto-generated pages for each Item Group with <code>show_in_website=1</code>
+- Shows: slideshow, description, product grid, filters
+- Product listing loaded via same JS as /all-products
+
+== Individual Product Pages ==
+
+=== Item Page (generated) ===
+
+'''Files:''' <code>templates/generators/item/item.html</code> + sub-templates
+
+Sub-templates:
+
+- <code>item_image.html</code> - Product image carousel
+- <code>item_details.html</code> - Title, item code, item group, description
+- <code>item_add_to_cart.html</code> - Price display, qty selector, add to cart (non-variant items)
+- <code>item_configure.html</code> + <code>item_configure.js</code> - Variant selector (template items)
+- <code>item_specifications.html</code> - Item attributes table
+- <code>item_reviews.html</code> - Customer reviews
+- <code>item_inquiry.html</code> + <code>item_inquiry.js</code> - Product inquiry form
+
+=== Product Info API ===
+
+'''File:''' <code>webshop/shopping_cart/product_info.py</code>
+
+<code>get_product_info_for_website(item_code)</code> returns:
+
+- price (formatted_price, price_list_rate, currency)
+- qty in cart
+- stock status (in_stock, stock_qty, on_backorder)
+- UOM info
+
+== Product Data Engine ==
+
+=== Query Engine (<code>product_data_engine/query.py</code>) ===
+
+- <code>ProductQuery.query()</code> - main search/filter method
+- Supports: text search, field filters, attribute filters
+- Returns items with price and discount info
+- Falls back to legacy search if RediSearch unavailable
+
+=== Filter Builder (<code>product_data_engine/filters.py</code>) ===
+
+- <code>ProductFiltersBuilder</code> - builds filter UI data
+- Field filters from Webshop Settings
+- Attribute filters from Item Variant Attributes
+- Discount filters from pricing rules
+
+== Web Templates (Blocks) ==
+
+- <code>hero_slider/</code> - Homepage hero carousel
+- <code>product_card/</code> - Individual product card
+- <code>product_category_cards/</code> - Category card grid
+- <code>item_card_group/</code> - Group of item cards
+
+----
+
+'''Navigation:''' [Webshop-Index Webshop Index] | [Webshop-03-Shopping-Cart-Quotation-Deep-Dive Previous: 03 - Shopping Cart] | [Webshop-05-Variant-Selector Next: 05 - Variant Selector]

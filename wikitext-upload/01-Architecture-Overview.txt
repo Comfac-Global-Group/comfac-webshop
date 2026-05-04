@@ -1,0 +1,76 @@
+= 01 - Architecture Overview =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/01-Architecture-Overview Comfac Webshop Wiki - Chapter 01]
+
+----
+
+== Framework Stack ==
+
+- '''Frappe Framework''' - Python/JS full-stack framework
+  - Server: Python 3, MariaDB/PostgreSQL
+  - ORM: Frappe DocType system (metadata-driven)
+  - Web: Jinja2 templates, jQuery frontend
+  - API: Whitelisted Python functions exposed as REST endpoints
+- '''ERPNext''' - ERP layer providing Item, Customer, Quotation, Sales Order, Pricing Rule, etc.
+- '''Payments''' - Payment gateway integration
+
+== How the App Integrates ==
+
+The webshop is a '''Frappe app''' installed alongside ERPNext. It:
+
+1. '''Overrides ERPNext DocTypes''' via <code>override_doctype_class</code> in hooks.py:
+   - <code>Item</code> -> adds website publishing fields
+   - <code>Item Group</code> -> adds website rendering (acts as category pages)
+   - <code>Payment Request</code> -> customized payment flow
+
+2. '''Hooks into doc_events''' for Quotation (validate cart items), Item (sync Website Item), Price List, Tax Rule
+
+3. '''Provides website generators''' for <code>Website Item</code> and <code>Item Group</code> (auto-generates web pages from DocType records)
+
+4. '''Registers web pages''' at:
+   - <code>/all-products</code> - product listing with filters
+   - <code>/shop-by-category</code> - category browsing
+   - <code>/cart</code> - shopping cart page
+   - <code>/orders</code> - order history
+   - <code>/wishlist</code> - saved items
+   - <code>/<item-route></code> - individual product pages (generated)
+   - <code>/<item-group-route></code> - category pages (generated)
+
+== Data Flow Summary ==
+
+<pre>
+Website Item (published product)
+    |
+    v
+Product Page (variant selector if template item)
+    |
+    v
+Add to Cart -> Quotation (order_type="Shopping Cart", docstatus=0)
+    |           - Quotation Item rows (item_code, qty, rate, amount)
+    |           - Pricing rules applied via ERPNext
+    |           - Taxes calculated
+    v
+Place Order -> Quotation.submit() -> Sales Order created
+    |
+    v
+Payment (if checkout enabled) -> Payment Request
+<pre>
+
+== Key Design Decisions ==
+
+=== 1. Cart = Quotation ===
+The shopping cart IS an ERPNext Quotation document with <code>order_type="Shopping Cart"</code>. All pricing, taxes, and discounts flow through ERPNext's standard Quotation logic.
+
+=== 2. Website Item vs Item ===
+ERPNext <code>Item</code> is the master. <code>Website Item</code> is a separate DocType that links to <code>Item</code> and adds web-specific fields (route, images, description). This allows selective publishing.
+
+=== 3. Variant Handling ===
+Uses ERPNext's Item Variant system. Template items show a configurator; variant items are the actual purchasable products. Variant data is cached in Redis.
+
+=== 4. No SPA ===
+Traditional server-rendered pages with jQuery for interactivity. Cart updates happen via AJAX calls that return re-rendered HTML fragments.
+
+----
+
+'''Next:''' [Webshop-02-DocTypes 02 - DocTypes]

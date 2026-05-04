@@ -1,0 +1,100 @@
+= 06 - Pricing & Discounts =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Previous:''' [Webshop-05-Variant-Selector 05 - Variant Selector]  
+'''Next:''' [Webshop-07-Checkout-and-Orders 07 - Checkout & Orders]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/06-Pricing-and-Discounts Comfac Webshop Wiki - Chapter 06]
+
+----
+
+== Pricing Architecture ==
+
+ERPNext's pricing engine handles all calculations:
+
+1. '''Price List''' - Base prices per item
+2. '''Pricing Rules''' - Discounts based on conditions (qty, customer, date range, etc.)
+3. '''Coupon Codes''' - Additional discounts via codes
+4. '''Tax Rules''' - Tax calculation
+
+The webshop reads the '''results''' of these calculations but does not implement the logic itself.
+
+== Discount Calculation Flow ==
+
+<pre>
+1. User adds item to cart
+2. cart.py:apply_cart_settings() calls set_price_list_and_rate()
+3. ERPNext pricing engine:
+   - Reads Price List for base price (price_list_rate)
+   - Checks Pricing Rules for discounts
+   - Applies discount to get rate
+4. calculate_taxes_and_totals() computes:
+   - item.amount = rate * qty
+   - doc.total = sum of all item.amount
+<pre>
+
+== Key Pricing Fields on Quotation ==
+
+{| class="wikitable"
+|-
+| Field
+| Location
+| Contains
+|}
+|---------|-------------|-------------|
+{| class="wikitable"
+|-
+| <code>price_list_rate</code>
+| Quotation Item
+| Original price from Price List
+|-
+| <code>rate</code>
+| Quotation Item
+| Final price after discount
+|-
+| <code>discount_percentage</code>
+| Quotation Item
+| % discount applied
+|-
+| <code>discount_amount</code>
+| Quotation Item
+| Fixed discount amount
+|-
+| <code>amount</code>
+| Quotation Item
+| Line total (rate * qty)
+|-
+| <code>total</code>
+| Quotation
+| Sum of all item amounts
+|-
+| <code>net_total</code>
+| Quotation
+| Total after item-level discounts
+|-
+| <code>discount_amount</code>
+| Quotation
+| Additional order-level discount
+|-
+| <code>grand_total</code>
+| Quotation
+| Final total with taxes
+|-
+| <code>coupon_code</code>
+| Quotation
+| Applied coupon code
+|}
+
+== Missing: Discount Visibility ==
+
+'''Critical Gap:''' While ERPNext calculates and stores all pricing data, the webshop templates do not display:
+- Original prices (strikethrough)
+- Discount percentages
+- "You save" amounts
+- Offer deadlines
+- Total savings
+
+'''See:''' [Webshop-10-Feature-Gap-Cart-Discounts Feature Gap: Cart Discounts] for implementation plan
+
+----
+
+'''Navigation:''' [Webshop-Index Webshop Index] | [Webshop-05-Variant-Selector Previous: 05 - Variant Selector] | [Webshop-07-Checkout-and-Orders Next: 07 - Checkout & Orders]

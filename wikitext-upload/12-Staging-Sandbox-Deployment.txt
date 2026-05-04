@@ -1,0 +1,137 @@
+= 12 - Staging Sandbox Deployment =
+
+'''Parent:''' [Webshop-Index Webshop Index]  
+'''Previous:''' [Webshop-11-Feature-Plan-System-Builder 11 - Feature Plan: System Builder]  
+'''Next:''' [Webshop-13-Discount-Visibility-and-Urgency 13 - Discount Visibility & Urgency]  
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/12-Staging-Sandbox-Deployment Comfac Webshop Wiki - Chapter 12]
+
+----
+
+== Purpose ==
+
+Create an isolated environment to:
+1. Clone production ERPNext instance
+2. Install comfac-webshop fork
+3. Validate seamless replacement of existing webshop
+4. Test new features without affecting production
+
+== Phase 0: Baseline Validation ==
+
+'''Objective:''' Verify comfac-webshop fork runs identically to base webshop
+
+=== Steps ===
+
+#### 1. Clone Production Instance
+
+<pre>bash
+= Backup production site =
+bench --site production-site backup
+
+= Create staging site from backup =
+bench --site staging-site restore production-site_backup.sql
+<pre>
+
+#### 2. Install Fork
+
+<pre>bash
+= Get comfac-webshop =
+bench get-app https://github.com/Comfac-Global-Group/comfac-webshop.git
+
+= Install on staging site =
+bench --site staging-site install-app webshop
+<pre>
+
+#### 3. Validation Checklist
+
+{| class="wikitable"
+|-
+| Test
+| Pass Criteria
+|}
+|--------|--------------------|
+{| class="wikitable"
+|-
+| Site loads
+| No 500 errors on homepage
+|-
+| Product listing
+| /all-products shows items
+|-
+| Product pages
+| Individual items render correctly
+|-
+| Add to cart
+| Items added to cart successfully
+|-
+| Cart page
+| /cart displays items with correct totals
+|-
+| Checkout flow
+| Place order creates Sales Order
+|-
+| Payment
+| Payment Request generates correctly
+|-
+| Wishlist
+| Add/remove items works
+|-
+| Search
+| Product search returns results
+|-
+| Filters
+| Category/attribute filters work
+|-
+| Variant selector
+| Template items show configurator
+|}
+
+#### 4. Comparison Testing
+
+- Side-by-side comparison of base webshop vs fork
+- Same items, same prices, same cart behavior
+- No feature changes in Phase 0
+
+'''⚠️ Do not proceed to Phase 1 until Phase 0 passes all checks.'''
+
+== Phase 1: Feature Development ==
+
+'''Objective:''' Implement features on clone of successful staging
+
+=== Steps ===
+
+#### 1. Clone Validated Staging
+
+<pre>bash
+= Backup Phase 0 staging =
+bench --site staging-site backup
+
+= Restore to experiment site =
+bench --site experiment-site restore staging-site_backup.sql
+<pre>
+
+#### 2. Implement Features
+
+- Implement discount visibility (Chapter 10)
+- Test each scenario thoroughly
+- Implement System Builder (Phase 1)
+
+#### 3. Test Data Setup
+
+- Create sample products with pricing rules
+- Set up coupon codes
+- Create offer deadlines
+- Build system builder templates
+
+== Phase 2: Production Merge ==
+
+'''Criteria for merge:'''
+
+- All Phase 0 validation checks pass
+- Phase 1 feature tests complete
+- No regressions from base webshop
+- Documentation updated
+- Rollback plan prepared
+
+----
+
+'''Navigation:''' [Webshop-Index Webshop Index] | [Webshop-11-Feature-Plan-System-Builder Previous: 11 - System Builder] | [Webshop-13-Discount-Visibility-and-Urgency Next: 13 - Discount Visibility]
