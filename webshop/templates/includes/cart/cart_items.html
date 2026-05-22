@@ -12,9 +12,25 @@
 			</span>
 		</div>
 	{% else %}
-		<span class="item-rate">
-			{{ _('Rate:') }} {{ item.get_formatted('rate') }}
-		</span>
+		<div class="item-rate">
+			{% if item.price_list_rate and item.price_list_rate != item.rate %}
+				<span class="original-price text-muted" style="text-decoration: line-through;">
+					{{ item.get_formatted('price_list_rate') }}
+				</span>
+				<span class="discounted-rate text-success ml-2">
+					{{ item.get_formatted('rate') }}
+				</span>
+				{% if item.discount_percentage %}
+					<span class="discount-badge badge badge-success ml-2">
+						-{{ frappe.utils.cstr(item.discount_percentage) }}%
+					</span>
+				{% endif %}
+			{% else %}
+				<span class="item-rate">
+					{{ _('Rate:') }} {{ item.get_formatted('rate') }}
+				</span>
+			{% endif %}
+		</div>
 	{% endif %}
 {% endmacro %}
 

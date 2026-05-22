@@ -5,10 +5,24 @@
 </h6>
 {% endif %}
 
+{# Calculate total savings from item-level discounts #}
+{% set total_savings = namespace(value=0) %}
+{% for item in doc.items %}
+	{% if item.price_list_rate and item.price_list_rate != item.rate %}
+		{% set total_savings.value = total_savings.value + ((item.price_list_rate - item.rate) * item.qty) %}
+	{% endif %}
+{% endfor %}
+
 <div class="card h-100">
 	<div class="card-body p-0">
 		{% if cart_settings.enable_checkout or cart_settings.show_price_in_quotation %}
 			<table class="table w-100">
+				{% if total_savings.value > 0 %}
+				<tr>
+					<td class="bill-label text-success">{{ _("Your Savings") }}</td>
+					<td class="bill-content text-success text-right">-{{ frappe.utils.fmt_money(total_savings.value, currency=doc.currency) }}</td>
+				</tr>
+				{% endif %}
 				<tr>
 					{% set total_items = frappe.utils.cstr(frappe.utils.flt(doc.total_qty, 0)) %}
 					<td class="bill-label">{{ _("Net Total (") + total_items + _(" Items)") }}</td>
