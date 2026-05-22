@@ -1,4 +1,34 @@
 <!-- Total at the end of the cart items -->
+{% set total_savings = namespace(value=0) %}
+{% for item in doc.items %}
+    {% if item.price_list_rate and item.price_list_rate != item.rate %}
+        {% set total_savings.value = total_savings.value + ((item.price_list_rate - item.rate) * item.qty) %}
+    {% endif %}
+{% endfor %}
+
+{% if total_savings.value > 0 %}
+<tr>
+    <th></th>
+    <th class="text-left" colspan="1">
+        <span class="text-muted">{{ _("Original Subtotal") }}</span>
+    </th>
+    <th class="text-left totals" colspan="3">
+        <span class="text-muted" style="text-decoration: line-through;">
+            {{ frappe.utils.fmt_money(doc.total + total_savings.value, currency=doc.currency) }}
+        </span>
+    </th>
+</tr>
+<tr>
+    <th></th>
+    <th class="text-left text-success" colspan="1">
+        {{ _("Item Discounts") }}
+    </th>
+    <th class="text-left text-success totals" colspan="3">
+        -{{ frappe.utils.fmt_money(total_savings.value, currency=doc.currency) }}
+    </th>
+</tr>
+{% endif %}
+
 <tr>
 	<th></th>
 	<th class="text-left item-grand-total" colspan="1">

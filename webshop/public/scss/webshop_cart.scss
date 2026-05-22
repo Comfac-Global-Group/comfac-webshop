@@ -712,6 +712,22 @@ body.product-page {
 				.item-rate {
 					font-size: 13px;
 					color: var(--text-muted);
+
+					.original-price {
+						font-size: 12px;
+						color: var(--gray-500);
+					}
+
+					.discounted-rate {
+						font-size: 13px;
+						font-weight: 500;
+					}
+
+					.discount-badge {
+						font-size: 11px;
+						padding: 2px 6px;
+						border-radius: 4px;
+					}
 				}
 
 				.free-tag {
@@ -1404,4 +1420,24 @@ body.product-page {
 
 .w-fit {
 	width: fit-content !important;
+}
+
+.cart-dropdown {
+	.col-amount {
+		.original-price {
+			font-size: 11px;
+			color: var(--gray-500);
+		}
+
+		.discounted-rate {
+			font-size: 13px;
+			font-weight: 500;
+			color: var(--green-info);
+		}
+
+		.discount-badge {
+			font-size: 10px;
+			padding: 1px 4px;
+		}
+	}
 }
