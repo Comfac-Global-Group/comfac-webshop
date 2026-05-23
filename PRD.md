@@ -5,7 +5,9 @@
 **Date:** March 2026  
 **Status:** Draft - Pending Staging Sandbox Validation  
 **Repository:** https://github.com/Comfac-Global-Group/comfac-webshop  
-**Base:** Fork of Frappe Webshop (https://github.com/frappe/webshop)
+**Base:** Fork of Frappe Webshop (https://github.com/frappe/webshop). Now Comfac's standalone private fork (`cwp`).
+**Deployment:** GitHub private remote (`comfac-webshop-private`) → Frappe Cloud. Forgejo is local origin; pushed to both manually.
+**Goal:** cwp as the sole webshop engine — no upstream fws installed alongside it. (Pending: remove `payments` from `required_apps`.)
 
 ---
 
@@ -51,6 +53,32 @@ This document defines the product requirements for new features in Comfac Websho
 3. **Phase 2 (Production):** Merge only after Phase 1 validation passes
 
 **Do not skip Phase 0.**
+
+---
+
+### 2026-05-23 15:19 — Standalone cwp Deployment Clarification
+
+**cwp (comfac-webshop-private)** is Comfac's private fork of upstream Frappe WebShop (fws).
+The long-term goal is for cwp to function as the sole webshop engine on any bench — upstream fws
+will NOT be installed alongside it.
+
+**What cwp is today (95% fws):**
+- All routing, DocTypes, cart logic, search, checkout inherited unchanged from upstream fws
+- 5% delta = Comfac's UI additions: cart discount display, savings summary, mini-cart price/discount,
+  associated CSS
+
+**Current blocker for standalone install:**
+`hooks.py` declares `required_apps = ["payments", "erpnext"]` — unchanged from upstream fws.
+The `payments` app must either be added to the bench, or removed from `required_apps` (if unused),
+before cwp can be installed standalone.
+
+**Deployment path:** `github-private` remote (`comfac-webshop-private.git`) → Frappe Cloud.
+Forgejo (`git.comfac-it.net`) is the development origin; changes are pushed to both remotes.
+
+**Phase 0 target (etest — t3.comfac-it.com):**
+Install cwp on etest bench, then create Website Item records from the 89 Items that already have
+`published_in_website=1`. Use `webshop/patches/create_website_items.py` or a bench console script
+calling `make_website_item()`. Verify `/all-products` and cart flow end-to-end.
 
 ---
 

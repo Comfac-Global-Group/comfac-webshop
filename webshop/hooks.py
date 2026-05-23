@@ -2,9 +2,9 @@ from . import __version__ as _version
 
 app_name = "webshop"
 app_title = "Webshop"
-app_publisher = "Frappe Technologies Pvt. Ltd."
-app_description = "Open Source eCommerce Platform"
-app_email = "contact@frappe.io"
+app_publisher = "Comfac Global Group (cwp fork)"
+app_description = "Comfac WebShop — eCommerce platform (fork of Frappe WebShop)"
+app_email = "contact@comfac-it.com"
 app_license = "GNU General Public License (v3)"
 app_version = _version
 

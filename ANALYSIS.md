@@ -1396,4 +1396,53 @@ Webshop
 
 ---
 
+---
+
+### 2026-05-23 15:19 — cwp vs etest Deployment Gap
+
+**Root cause of `/all-products` 404 on etest (t3.comfac-it.com):**
+
+cwp is NOT installed for the etest site. This is the single root cause of all observed failures.
+
+| Signal | State | Explanation |
+|--------|-------|-------------|
+| `/all-products` | 404 | Route handler at `webshop/www/all-products/` missing — cwp not installed |
+| `Website Item` DocType | DoesNotExistError | cwp not installed; DocType not in DB |
+| `Shopping Cart Settings` | DoesNotExistError | Same cause |
+| `Webshop Settings` | DoesNotExistError | Same cause |
+| Items with `published_in_website=1` | 89 items ✅ | Replicated from ecit |
+| Website Item records | 0 | No cwp = no Website Item table |
+| cwp in bench `apps/` | ✅ Present | App directory exists on bench |
+| cwp installed for site | ❌ | `bench list-apps` confirms: only frappe, erpnext, hrms, print_designer |
+| Webshop assets served | ✅ | CSS/JS bundles at `/assets/webshop/` — app is in bench even if not installed for site |
+
+**cwp = Comfac's standalone fork of fws (95% identical):**
+- cwp is 95% upstream Frappe WebShop — all routing, DocTypes, cart logic, checkout unchanged
+- The 5% delta is Comfac's cart UI additions (discount display, savings summary, mini-cart)
+- cwp is NOT a separate webshop engine — it IS fws with Comfac's UI layer on top
+- No upstream fws will be installed alongside cwp; cwp replaces it entirely
+
+**Install blocker — `payments` dependency:**
+`hooks.py` line 11: `required_apps = ["payments", "erpnext"]`
+The `payments` app is not in the etest bench. Attempting `bench install-app webshop` failed with:
+```
+No module named 'payments'
+An error occurred while installing webshop
+```
+Resolution options:
+1. Add `payments` to the bench via Frappe Cloud dashboard, then install cwp
+2. Remove `payments` from `required_apps` in `hooks.py` (safe only if no payment gateway features used)
+
+**Note on earlier 260523 log entries:**
+A previous log entry from this date stated "All items accessible via /all-products route on webshop"
+— this was incorrect. `/all-products` returns 404 on etest. The analysis above is the authoritative
+finding based on direct API and SSH verification.
+
+**Next actions:**
+1. Resolve `payments` blocker (dashboard install or remove from `required_apps`)
+2. Install cwp: `bench --site test260204.s.frappe.cloud install-app webshop`
+3. Run `create_website_items.py` patch or bench console script using `make_website_item()` to
+   create Website Item records from the 89 items with `published_in_website=1`
+4. Verify `/all-products` renders and cart flow works end-to-end on etest
+
 *Analysis compiled from Frappe Webshop codebase and Comfac Webshop Wiki documentation*
