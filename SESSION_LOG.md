@@ -440,6 +440,131 @@ and Frappe Cloud operations:
 
 ---
 
+## 2026-05-23 19:30 — Cart FULLY WORKING ✅ + RCA: Broken Layout + Missing Products
+
+**Owner:** Justin (fix via UI) / Claude (RCA + log)
+**Status:** 🟢 Cart working end-to-end. Discount display, savings, VAT, Request for Quote all confirmed.
+
+### Verified Working State
+
+| Feature | Status | Evidence |
+|---------|--------|----------|
+| `/cart` renders | ✅ | Screenshot 2026-05-23 |
+| Discount strikethrough (Netgate 1100) | ✅ | ~~₱39,100.00~~ → ₱29,325.00 |
+| Discount badge | ✅ | -25% green badge |
+| Payment Summary — Your Savings | ✅ | -₱9,775.00 in green |
+| Payment Summary — Net Total | ✅ | ₱89,325.00 (2.0 Items) |
+| Payment Summary — VAT @ 12.0 | ✅ | ₱10,719.00 |
+| Payment Summary — Grand Total | ✅ | ₱100,044.00 |
+| Item Discounts row | ✅ | -₱9,775.00 |
+| Original Subtotal strikethrough | ✅ | ~~₱98,100.00~~ |
+| Request for Quote button | ✅ | Visible in Payment Summary card |
+| Shipping Address section | ✅ | "Add a new address" |
+| Past Quotes / Continue Shopping | ✅ | Bottom of items panel |
+
+The cwp 5% delta (cart discount display) is **fully confirmed working**.
+
+---
+
+### RCA Part 1 — Broken Layout (/all-products empty, icons unstyled)
+
+**Symptom:** After deploy, `/all-products` showed a completely broken page — huge unstyled
+icons (cart, heart), empty product grid, text-only layout.
+
+**Root cause chain:**
+
+| # | Cause | Detail |
+|---|-------|--------|
+| 1 | Bundle not served | `web.bundle.js` and `webshop-web.bundle.css` require compiled dist/ files. Manual `bench install-app` does NOT run `bench build`. |
+| 2 | No bench build on install | When cwp was installed via SSH `bench get-app` + `bench install-app`, `bench build` was never explicitly run. dist/ files may not have existed. |
+| 3 | asset.json gap | Frappe resolves bundle filenames through `asset.json` on the bench. Without it, bundle URLs 404. |
+| 4 | Fallback list was incomplete | The commented-out individual source file fallback in hooks.py listed `init.js`, `shopping_cart.js`, `wishlist.js`, `customer_reviews.js` — but was **missing `product_ui/grid.js`, `product_ui/list.js`, `product_ui/search.js`, `product_ui/views.js`**. Even if used, the product grid would still be empty. |
+| 5 | Settings confusion | `login_required_to_view_products: 1` was set on etest (not on ecit). This alone would block the product grid for anonymous users regardless of JS loading. |
+
+**Immediate fix applied:** User configured Webshop Settings via ERPNext UI to match ecit —
+clearing `login_required_to_view_products` and setting correct values. CSS/JS bundles resolved
+after cache clear or were already accessible.
+
+**Permanent fix needed in hooks.py** (not yet applied — document only):
+If switching to individual source files, the complete list must be:
+```python
+web_include_js = [
+    "webshop/js/init.js",
+    "webshop/js/product_ui/grid.js",      # renders product cards
+    "webshop/js/product_ui/list.js",      # list view
+    "webshop/js/product_ui/search.js",    # search + filters
+    "webshop/js/product_ui/views.js",     # view toggle
+    "webshop/js/shopping_cart.js",        # cart functionality
+    "webshop/js/wishlist.js",             # wishlist
+    "webshop/js/customer_reviews.js",     # reviews
+]
+```
+The `override/homepage.js` and `override/item.js` are desk-side scripts — NOT for web_include_js.
+
+---
+
+### RCA Part 2 — Webshop Settings Gap (ecit vs etest)
+
+**Symptom:** etest webshop missing filter sidebar, products hidden for guests, wrong
+payment redirect, save-as-draft not working.
+
+**Gap table (etest vs ecit):**
+
+| Field | ecit | etest (before fix) | Impact |
+|-------|------|--------------------|--------|
+| `login_required_to_view_products` | 0 (unset) | **1** | 🔴 Products hidden for guests |
+| `enable_field_filters` | 1 | 0 (unset) | 🟡 No field filter sidebar |
+| `enable_attribute_filters` | 1 | 0 (unset) | 🟡 No attribute filter sidebar |
+| `save_quotations_as_draft` | 1 | 0 (unset) | 🟡 Quotations submitted immediately |
+| `payment_success_url` | Orders | Invoices | 🟡 Wrong redirect after payment |
+| `filter_fields` | [brand, item_group] | empty | 🟡 No field filters |
+| `filter_attributes` | [Colour, Size] | empty | 🟡 No attribute filters |
+| `allow_non_website_items_in_cart_quotation` | 0 (unset) | 1 | 🟡 Extra setting (watch) |
+
+**Fix:** User corrected settings via Webshop Settings form in ERPNext UI on etest.
+
+**Root cause of the gap:** Webshop Settings is a Single DocType — it cannot be exported
+as a fixture easily. During ecit → etest replication, these settings were not copied.
+
+---
+
+### RCA Part 3 — Recurring Theme: Feature Loss on Deploy
+
+**Pattern observed (3rd occurrence this session):**
+Every cwp deploy or settings change has caused unexpected feature regression. The root cause
+is always one of:
+1. Settings not synced from ecit → etest
+2. Asset bundles not built/served after code deploy
+3. A Frappe conditional (mandatory_depends_on vs depends_on) misunderstood
+
+**CWP PRINCIPLE (must be internalized):**
+> cwp never adds new data sources. It only DISPLAYS information that Frappe already
+> provides on the quotation/cart line items (discount_percentage, price_list_rate, rate,
+> amount, taxes_and_charges). The upstream fws already has these fields on the quotation.
+> cwp's 5% delta is purely cosmetic template changes to show them.
+
+**Corollary:** If something isn't showing in cwp that should be there, the cause is NEVER
+in cwp's template logic. It is ALWAYS in:
+- Settings (Webshop Settings not configured correctly)
+- Data (item doesn't have a discount/pricing rule applied)
+- Assets (CSS/JS not loaded, so styling/interactivity is absent)
+
+**Pre-Deploy Audit Checklist (new process):**
+
+Before every etest or ecit deploy:
+
+| # | Check | How |
+|---|-------|-----|
+| 1 | Webshop Settings parity | Compare ecit vs etest via API; sync all fields |
+| 2 | Anonymous user view | Open /all-products in private/incognito — products must show |
+| 3 | JS console clean | No 404s on bundle files in browser console |
+| 4 | Route smoke test | /all-products → /item-page → /cart → Request for Quote |
+| 5 | Discount visible | Add a discounted item; verify strikethrough + badge + savings |
+| 6 | VAT applied | Cart total includes tax row |
+| 7 | fws feature parity | Everything fws shows, cwp shows + discount additions |
+
+---
+
 ## 2026-05-23 18:00 — Awesome Bar: cwp DocTypes Not Searchable
 
 **Owner:** Claude (analysis + log)
