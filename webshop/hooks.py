@@ -12,7 +12,13 @@ required_apps = ["erpnext"]  # payments removed for standalone cwp deploy
 
 web_include_css = "webshop-web.bundle.css"
 
-web_include_js = "web.bundle.js"
+# Use individual source files (Frappe Cloud CDN doesn't have the bundle for manual installs)
+web_include_js = [
+    "webshop/js/init.js",
+    "webshop/js/shopping_cart.js",
+    "webshop/js/wishlist.js",
+    "webshop/js/customer_reviews.js",
+]
 
 after_install = "webshop.setup.install.after_install"
 on_logout = "webshop.webshop.shopping_cart.utils.clear_cart_count"
