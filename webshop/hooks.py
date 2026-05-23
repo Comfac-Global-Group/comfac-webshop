@@ -8,7 +8,7 @@ app_email = "contact@frappe.io"
 app_license = "GNU General Public License (v3)"
 app_version = _version
 
-required_apps = ["payments", "erpnext"]
+required_apps = ["erpnext"]  # payments removed for standalone cwp deploy
 
 web_include_css = "webshop-web.bundle.css"
 
@@ -74,5 +74,5 @@ doc_events = {
 
 has_website_permission = {
     "Website Item": "webshop.webshop.doctype.website_item.website_item.has_website_permission_for_website_item",
-    "Item Group": "webshop.webshop.doctype.website_item.website_item.has_website_permission_for_item_group"
+    "Item Group": "webshop.webshop.doctype.website_item.website_item.has_website_permission_for_item_group",
 }
