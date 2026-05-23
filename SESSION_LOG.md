@@ -2,6 +2,43 @@
 
 ---
 
+## Week of 2026-05-19
+
+**Focus:** cwp first install on etest — standalone deploy, cart discount display, RCA
+**Overall Status:** 🟢 Cart working end-to-end on etest
+
+### Completed
+- Removed `payments` from `required_apps` (standalone deploy blocker)
+- Installed cwp on etest via SSH `bench get-app` + `bench install-app`
+- Created 89 Website Items from published Items via `make_website_item()`
+- Configured Webshop Settings (company, price list, enabled)
+- Debugged and fixed `MandatoryError` cart blocker (Quotation custom fields `reqd=1`)
+- RCA: `mandatory_depends_on` is UI-only; `depends_on` + `reqd=0` is the correct server-side fix
+- Applied cart fix to etest; same fix documented for ecit (pending)
+- Added Webshop workspace JSON — module now appears in ERPNext left panel
+- Identified and fixed Webshop Settings gap (ecit → etest): `login_required_to_view_products`,
+  filter settings, payment URL, draft quotations
+- Verified full cart flow: discount display, savings, VAT @ 12%, Request for Quote ✅
+- RCA documented: broken layout causes, settings gaps, pre-deploy audit checklist
+- Asset serving RCA: manual `bench install` does not run `bench build`; CDN vs local diff
+- Multi-model verification protocol documented for forked Frappe apps
+
+### In Progress
+- Awesome Bar: cwp DocTypes not searchable — workspace JSON committed, pending SSH deploy
+- SSH access to etest blocked ("Too many authentication failures")
+
+### Blockers
+- Frappe Cloud SSH gateway rejecting auth — `git pull` + `bench migrate` cannot run
+
+### Next Week
+- Resolve SSH access to etest bench
+- `git pull` + `bench migrate` + `clear-cache` on etest → Awesome Bar shows cwp DocTypes
+- Apply Quotation `depends_on` fix to ecit before enabling webshop there
+- Complete Webshop Settings filter_fields and filter_attributes replication to etest
+- Begin ecit webshop soft launch preparation
+
+---
+
 ## 2026-05-23 — cwp Install on etest: Full Success Path + Cart Blocker
 
 **Owner:** OpenCode (install + fix) / Claude (analysis + log)

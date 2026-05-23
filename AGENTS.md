@@ -2,7 +2,7 @@
 
 > **For:** Kimi, Claude, DeepSeek, OpenCode, or any AI assistant  
 > **Repo:** `comfac-webshop` — web shop setup, product listings, pricing, and e-commerce configuration  
-> **Last Updated:** 2026-05-15
+> **Last Updated:** 2026-05-23
 
 ---
 
@@ -106,62 +106,91 @@ See **`UPSTREAM-SYNC.md`** for the step-by-step process. Short version:
 
 ---
 
-## 2026-05-23 15:19 — cwp Deployment & Standalone Status
+## CWP Core Principle (read before any change)
 
-**cwp (comfac-webshop-private)** is Comfac's own private fork of Frappe WebShop (fws). It is
-Comfac's designated webshop engine and the long-term goal is for it to be deployable standalone
-on any bench — **not** dependent on the upstream fws app being installed alongside it.
+> **cwp never adds new data sources. It only DISPLAYS information Frappe already provides
+> on quotation/cart line items: `discount_percentage`, `price_list_rate`, `rate`, `amount`,
+> `taxes_and_charges`. The upstream fws already exposes all these fields.**
 
-### Current State (as of 2026-05-23)
+Corollary: if a feature is missing or broken in cwp, the cause is **never** in cwp's templates.
+Always look at:
+1. **Settings** — Webshop Settings not configured (most common)
+2. **Data** — pricing rule / discount not applied to the item
+3. **Assets** — CSS/JS bundle not built or not served
 
-**cwp is 95% identical to upstream fws.** The 5% delta is Comfac's UI additions:
-- Cart item discount display (strikethrough original price, savings summary, green rate badge)
-- Cart payment summary savings row
-- Mini-cart navbar dropdown price/discount display
-- Associated SCSS/CSS for discount elements
+The 5% cwp delta vs upstream fws:
+- `webshop/templates/includes/cart/cart_items.html` — discount row display
+- `webshop/templates/includes/cart/cart_items_dropdown.html` — mini-cart discount display
+- `webshop/hooks.py` — publisher info, `payments` removed from `required_apps`
+- `webshop/__init__.py` — version
+- `webshop/webshop/workspace/webshop.json` — workspace registration (new)
+- `VERSION` — version file (new)
 
-Everything else — routing, DocTypes (`Website Item`, `Webshop Settings`, `Shopping Cart Settings`),
-search, checkout, cart logic — is inherited from upstream fws unchanged.
+All SCSS/CSS is **100% upstream fws** — cwp does not add or change any stylesheets.
 
-**`hooks.py` line 11 — OPEN BLOCKER for standalone install:**
-```python
-required_apps = ["payments", "erpnext"]
+---
+
+## Pre-Deploy Audit Checklist (run before every etest or ecit deploy)
+
+| # | Check | How |
+|---|-------|-----|
+| 1 | **Webshop Settings parity** | Compare ecit vs etest via API (see below); sync all fields |
+| 2 | **Anonymous product view** | Open `/all-products` in incognito — products must show |
+| 3 | **JS console clean** | No 404s on bundle files in browser network tab |
+| 4 | **Route smoke test** | `/all-products` → product page → `/cart` → Request for Quote |
+| 5 | **Discount visible** | Add a discounted item; verify strikethrough + badge + savings row |
+| 6 | **VAT applied** | Cart total includes tax row |
+| 7 | **fws feature parity** | Everything fws shows, cwp also shows |
+
+### Webshop Settings — Required Fields on Both ecit and etest
+
 ```
-This is unchanged from upstream fws. Installing cwp on any bench without the `payments` app will
-fail with `No module named 'payments'`. To achieve true standalone deployment:
-- Either remove `payments` from `required_apps` (safe only if cwp uses no payments gateway features)
-- Or add the `payments` app to the bench before installing cwp
+enabled: 1
+company: Comfac Corporation
+price_list: Standard Selling
+default_customer_group: All Customer Groups
+quotation_series: SAL-QTN-.YYYY.-
+products_per_page: 24
+show_price: 1
+show_price_in_quotation: 1
+show_stock_availability: 1
+allow_items_not_in_stock: 1
+save_quotations_as_draft: 1
+payment_success_url: Orders
+enable_wishlist: 1
+enable_reviews: 1
+enable_recommendations: 1
+enable_field_filters: 1
+enable_attribute_filters: 1
+filter_fields: [brand, item_group]
+filter_attributes: [Colour, Size]
+login_required_to_view_products: 0   ← MUST be 0 or unset; 1 hides products from guests
+```
 
-### Deployment Source
+⚠️ `login_required_to_view_products: 1` is the most dangerous misconfiguration — it silently
+hides all products from any visitor who is not logged in. Always verify this is 0.
 
-- **Primary remote:** `github-private` → `github.com/Comfac-Global-Group/comfac-webshop-private.git`
-- **Frappe Cloud** only accepts GitHub as an app source — this private remote is the deployment path
-- **Forgejo** (`git.comfac-it.net/cgg/comfac-webshop`) is the local origin; changes are pushed to
-  both remotes manually (not an automated mirror)
-- **Public GitHub** (`github.com/Comfac-Global-Group/comfac-webshop`) is the public fork reference —
-  keep in sync but do not use as the Frappe Cloud deploy source
+---
 
-### cwp DocTypes
+## 2026-05-23 — cwp Deployment & Current State
 
-cwp's own `Website Item` doctype is the source of truth for published products on any cwp-powered
-bench. When cwp is installed, agents should use `make_website_item()` (in
-`webshop/webshop/doctype/website_item/website_item.py`) or the patch
-`webshop/patches/create_website_items.py` to create Website Item records from Items that already
-have `published_in_website=1`.
+**cwp (comfac-webshop-private)** is Comfac's private fork of Frappe WebShop (fws), deployed
+standalone on etest (t3.comfac-it.com). payments dependency removed. v0.1.01.
 
-### etest Gap (t3.comfac-it.com)
+### etest State (as of 2026-05-23 end-of-day)
 
 | Signal | State |
 |--------|-------|
-| cwp in bench `apps/` | ✅ Present |
-| cwp installed for site | ❌ Not installed |
-| `Website Item` DocType | ❌ DoesNotExistError |
-| `/all-products` | ❌ 404 (route handler missing — cwp not installed) |
-| Items with `published_in_website=1` | ✅ 89 items |
-| Website Item records | ❌ 0 records |
-
-**Root cause of 404:** cwp provides the route handler at `webshop/www/all-products/`. Without cwp
-installed for the site, the route doesn't exist, so Frappe returns 404.
+| cwp installed for site | ✅ `test260204.s.frappe.cloud` |
+| `/all-products` | ✅ 200 |
+| 89 Website Items | ✅ Created via `make_website_item()` |
+| Add to Cart | ✅ QTN-CART-00001 created |
+| Cart discount display | ✅ Strikethrough, badge, savings |
+| VAT in cart | ✅ @ 12% |
+| Request for Quote | ✅ Visible |
+| Webshop module in left panel | ✅ Workspace JSON deployed |
+| Awesome Bar | 🟡 Pending SSH `git pull` + `bench migrate` |
+| SSH access | 🔴 Blocked — "Too many authentication failures" |
 
 **Immediate blocker:** `payments` app is not in the etest bench. Installing cwp fails with
 `No module named 'payments'`. Resolve via Frappe Cloud dashboard (add payments app) or by removing
