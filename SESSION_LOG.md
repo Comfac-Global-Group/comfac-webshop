@@ -479,23 +479,23 @@ On the upstream fws (Frappe WebShop) installed on ecit, the same search does sur
 
 **None.** `find webshop -name "*.json" -path "*/page/*"` returns empty. No desk pages registered.
 
-#### Root Cause
+#### Root Cause (confirmed from cwp source)
 
-ERPNext's Awesome Bar indexes DocTypes that belong to desk-registered modules. A module
-appears in the Awesome Bar search pool only when:
-1. A **Module Def** record exists for it in the database
-2. The module has **desktop icons** (`frappe.desk.doctype.desktop_icon`) or appears in the workspace
-3. The `module_name` in the app's DocType JSONs matches a registered module
+cwp has `modules.txt` containing "Webshop" — the Module Def record is created on `bench install-app`.
 
-cwp registers `"module": "Webshop"` in all DocType JSONs, and `hooks.py` declares
-`app_name = "webshop"` / `app_title = "Webshop"`, but there is **no Module Def record** and
-**no desk workspace** configured. Without these, Frappe's search engine has no pointer to the
-Webshop module — its DocTypes are installed in the database but invisible to the search index.
+**The missing piece:** `webshop/workspace/webshop.json` was **added in the v0.1.0 commit** (today,
+same commit as the `web_include_js` asset fix). This workspace JSON is what registers the Webshop
+module on the ERPNext desk and makes its DocTypes appear in Awesome Bar.
 
-Why ecit (fws) works: fws ships with a `Webshop` Module Def JSON and workspace configuration
-in its `webshop/module_def/` and `webshop/workspace/` directories. These get created on
-`bench install-app` via migrate. cwp, being a fork, inherits these files — but if the migration
-ran without them (or if there's a version mismatch), the Module Def record may not exist.
+However, etest was blocked on SSH (Frappe Cloud gateway was down) when that fix was committed — the
+bench never received a `git pull` for the v0.1.0 code. The etest bench is still running the pre-v0.1.0
+cwp code, which has no workspace JSON. Without the Workspace record, the Webshop module is invisible
+to Awesome Bar even though the Module Def exists.
+
+The workspace JSON is fully written and correct:
+- `"label": "Webshop"`, `"icon": "cart"`, `"category": "Modules"`
+- Links to: Website Items, Item Reviews, Wishlist, Webshop Settings, Offers, Homepage Featured Products
+- `is_standard: 1` — synced from app source on `bench migrate`
 
 #### Diagnostic Commands
 
@@ -516,25 +516,75 @@ curl -s -H "Authorization: $AUTH" \
   | python3 -c "import sys,json; d=json.load(sys.stdin); print([r['name'] for r in d.get('data',[])])"
 ```
 
-#### Next Action — Make cwp DocTypes Appear in Modules and Awesome Bar
+#### Current State (OpenCode v0.1.0 session)
 
-The Webshop module must be registered as a visible desk module. Steps:
+| Check | Status |
+|-------|--------|
+| Webshop Module Def in DB | ✅ Exists (app=webshop, from modules.txt) |
+| Workspace JSON in cwp source | ✅ `webshop/workspace/webshop.json` — committed v0.1.0 |
+| Workspace pushed to all remotes | ✅ origin (Forgejo), github, github-private |
+| hooks.py publisher | ✅ Updated to Comfac Global Group |
+| Version | ✅ v0.1.01 |
+| SSH deploy to etest | ❌ Blocked — Frappe Cloud gateway rejecting ("Too many authentication failures") |
+| asset.json path fix | ❌ Blocked — requires SSH |
 
-1. **Check cwp source** — does `webshop/module_def/webshop/webshop.json` exist? Does
-   `webshop/workspace/` have a Webshop workspace JSON? If not, create them or copy from fws.
+#### Next Action — Unblock SSH
 
-2. **Run `bench migrate`** on etest — if the JSON files exist, migrate will insert/update
-   the Module Def record.
+The workspace JSON is ready and correct. Once SSH is accessible:
 
-3. **Verify Awesome Bar** — after migrate + clear-cache, search "Website Item" in Awesome Bar
-   to confirm DocTypes are now indexed.
+```bash
+# On etest bench:
+cd ~/frappe-bench
+git -C apps/webshop pull          # pulls workspace JSON + all v0.1.0 changes
+bench --site test260204.s.frappe.cloud migrate  # syncs Workspace record from JSON
+bench --site test260204.s.frappe.cloud clear-cache
 
-4. **Apply same to ecit** — once verified on etest, ensure the same module registration
-   exists on ecit before webshop goes live.
+# Also fix asset.json (dist/ path for JS bundle):
+python3 -c "import json; assets={'web.bundle.js':'/assets/webshop/dist/js/web.bundle.WLOGYSZO.js','webshop-web.bundle.css':'/assets/webshop/dist/css/webshop-web.bundle.2AB4ZCAN.css'}; open('sites/test260204.s.frappe.cloud/public/assets/webshop/asset.json','w').write(json.dumps(assets, indent=2))"
+
+supervisorctl restart frappe-bench-web:
+```
+
+After these steps:
+- Webshop module appears in the left panel
+- cwp DocTypes (Website Item, Webshop Settings, etc.) appear in Awesome Bar
+- Cart icon and product grid should load (JS bundle served from dist/)
 
 | Step | Owner | Priority |
 |------|-------|----------|
-| Check module_def/ and workspace/ JSONs in cwp source | Agent | 🔴 Next |
-| Create Module Def / Workspace JSON if missing | Agent | 🔴 Next |
-| `bench migrate` + `clear-cache` on etest | Agent | 🔴 Next |
+| Resolve Frappe Cloud SSH auth ("Too many authentication failures") | Human / OpenCode | 🔴 Blocker |
+| `git pull` + `bench migrate` + `clear-cache` on etest | Agent (once SSH available) | 🔴 Next |
 | Verify Awesome Bar shows cwp DocTypes | Human | 🔴 Verify |
+| Verify cart icon visible on `/all-products` | Human | 🔴 Verify |
+
+---
+
+### Pre-Deploy Review — Workspace + hooks.py (Claude, 2026-05-23)
+
+**Workspace JSON: LGTM**
+
+| Check | Result |
+|-------|--------|
+| `public: 1` | ✅ Visible to all authenticated users |
+| `is_standard: 1` | ✅ Synced from app source on `bench migrate` |
+| `module: "Webshop"` | ✅ Matches modules.txt |
+| Links coverage | ✅ Website Items, Item Reviews, Wishlist, Webshop Settings, All Products |
+| Shortcuts | ✅ Website Items (published=1 filter), Webshop Settings, All Products |
+| `stats_filter` field name | ✅ `published` confirmed as fieldname on Website Item DocType |
+| Missing DocTypes | ℹ️ Homepage Featured Product, Recommended Items, Website Item Tabbed Section, Website Offer not in workspace — intentional (admin-only, reachable via Awesome Bar) |
+
+**hooks.py: LGTM with deploy-path caveat**
+
+`web_include_js = "web.bundle.js"` and `web_include_css = "webshop-web.bundle.css"` use the
+bundle path. Behaviour depends on deploy method:
+
+- **Frappe Cloud dashboard deploy** → full build pipeline, assets uploaded to CDN → bundles
+  resolve correctly. **Use this path for production.**
+- **Manual SSH (`git pull` only)** → no CDN upload → bundles 404 until `asset.json` is manually
+  fixed. Individual source file fallback is commented out in hooks.py (`web_include_js` list) —
+  uncomment if SSH-only deploy is unavoidable.
+
+**Version: 0.1.01** — non-standard zero-padded PATCH. Python parses as `0.1.1`. No functional
+impact (cwp not distributed via PyPI), but worth standardising to `0.1.1` in a future cleanup.
+
+**Verdict: ready to deploy via Frappe Cloud dashboard once SSH gateway is available for migrate.**

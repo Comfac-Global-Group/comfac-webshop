@@ -72,6 +72,29 @@ Every **Friday**:
 
 ---
 
+## Version Numbering Scheme
+
+cwp uses **semantic versioning** visible as `vMAJOR.MINOR.PATCH`:
+
+| Component | Meaning | Current |
+|-----------|---------|---------|
+| MAJOR | 0 = pre-release/development | 0 |
+| MINOR | Feature releases (1, 2, 3...) | 1 |
+| PATCH | Bugfix/config releases (01, 02, 03...) | 01 |
+
+- **`v0.MINOR.PATCH`**is the display format (e.g.,**v0.1.01**)
+- The version lives in `webshop/__init__.py` ( `__version__` ) and `VERSION` file
+- Every commit that changes behavior increments PATCH
+- Workspace/UI changes are PATCH increments
+- New features are MINOR increments
+- Production readiness (etest → ecit deploy) is MAJOR 1.0
+
+**Current version:** v0.1.01 — Initial cwp release on etest
+
+**Last commit format:** `v0.1.01: <description>`
+
+---
+
 ## Upstream Sync (Updating cwp from fws)
 
 See **`UPSTREAM-SYNC.md`** for the step-by-step process. Short version:
