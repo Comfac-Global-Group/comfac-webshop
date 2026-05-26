@@ -853,13 +853,13 @@ A configurable product builder where customers can assemble multi-component syst
 
 Create an isolated environment to:
 1. Clone production ERPNext instance
-2. Install comfac-webshop fork
+2. Install comfac-webstore fork
 3. Validate seamless replacement of existing webshop
 4. Test new features without affecting production
 
 ### 12.2 Phase 0: Baseline Validation
 
-**Objective:** Verify comfac-webshop fork runs identically to base webshop
+**Objective:** Verify comfac-webstore fork runs identically to base webshop
 
 **Steps:**
 
@@ -874,8 +874,8 @@ Create an isolated environment to:
 
 2. **Install Fork**
    ```bash
-   # Get comfac-webshop
-   bench get-app https://github.com/Comfac-Global-Group/comfac-webshop.git
+   # Get comfac-webstore
+   bench get-app https://github.com/Comfac-Global-Group/comfac-webstore.git
    
    # Install on staging site
    bench --site staging-site install-app webshop
@@ -1051,11 +1051,11 @@ On individual product pages, show active offers:
 
 ### 14.1 Prerequisite: Seamless Baseline First
 
-**This hypothesis is NOT to be executed until the comfac-webshop fork runs seamlessly as a drop-in replacement on a production-like ERPNext instance.**
+**This hypothesis is NOT to be executed until the comfac-webstore fork runs seamlessly as a drop-in replacement on a production-like ERPNext instance.**
 
 **Execution order:**
 
-1. **Phase 0 (Staging Sandbox):** Clone the production ERPNext instance, install comfac-webshop, validate it works identically to the existing webshop. No feature changes. Pass all validation checks.
+1. **Phase 0 (Staging Sandbox):** Clone the production ERPNext instance, install comfac-webstore, validate it works identically to the existing webshop. No feature changes. Pass all validation checks.
 
 2. **Phase 1 (Experiment Clone):** Once Phase 0 is proven stable, clone THAT successful staging instance into a second sandbox. This is where we implement and test the hypothesis below.
 
@@ -1398,39 +1398,39 @@ Webshop
 
 ---
 
-### 2026-05-23 15:19 — cwp vs etest Deployment Gap
+### 2026-05-23 15:19 — cws vs etest Deployment Gap
 
 **Root cause of `/all-products` 404 on etest (t3.comfac-it.com):**
 
-cwp is NOT installed for the etest site. This is the single root cause of all observed failures.
+cws is NOT installed for the etest site. This is the single root cause of all observed failures.
 
 | Signal | State | Explanation |
 |--------|-------|-------------|
-| `/all-products` | 404 | Route handler at `webshop/www/all-products/` missing — cwp not installed |
-| `Website Item` DocType | DoesNotExistError | cwp not installed; DocType not in DB |
+| `/all-products` | 404 | Route handler at `webshop/www/all-products/` missing — cws not installed |
+| `Website Item` DocType | DoesNotExistError | cws not installed; DocType not in DB |
 | `Shopping Cart Settings` | DoesNotExistError | Same cause |
 | `Webshop Settings` | DoesNotExistError | Same cause |
 | Items with `published_in_website=1` | 89 items ✅ | Replicated from ecit |
-| Website Item records | 0 | No cwp = no Website Item table |
-| cwp in bench `apps/` | ✅ Present | App directory exists on bench |
-| cwp installed for site | ❌ | `bench list-apps` confirms: only frappe, erpnext, hrms, print_designer |
+| Website Item records | 0 | No cws = no Website Item table |
+| cws in bench `apps/` | ✅ Present | App directory exists on bench |
+| cws installed for site | ❌ | `bench list-apps` confirms: only frappe, erpnext, hrms, print_designer |
 | Webshop assets served | ✅ | CSS/JS bundles at `/assets/webshop/` — app is in bench even if not installed for site |
 
-**cwp = Comfac's standalone fork of fws (95% identical):**
-- cwp is 95% upstream Frappe WebShop — all routing, DocTypes, cart logic, checkout unchanged
+**cws = Comfac's standalone fork of fws (95% identical):**
+- cws is 95% upstream Frappe WebShop — all routing, DocTypes, cart logic, checkout unchanged
 - The 5% delta is Comfac's cart UI additions (discount display, savings summary, mini-cart)
-- cwp is NOT a separate webshop engine — it IS fws with Comfac's UI layer on top
-- No upstream fws will be installed alongside cwp; cwp replaces it entirely
+- cws is NOT a separate webshop engine — it IS fws with Comfac's UI layer on top
+- No upstream fws will be installed alongside cws; cws replaces it entirely
 
 **Install blocker — `payments` dependency:**
 `hooks.py` line 11: `required_apps = ["payments", "erpnext"]`
-The `payments` app is not in the etest bench. Attempting `bench install-app webshop` failed with:
+The `payments` app is not in the etest bench. Attempting `bench install-app webstore` failed with:
 ```
 No module named 'payments'
 An error occurred while installing webshop
 ```
 Resolution options:
-1. Add `payments` to the bench via Frappe Cloud dashboard, then install cwp
+1. Add `payments` to the bench via Frappe Cloud dashboard, then install cws
 2. Remove `payments` from `required_apps` in `hooks.py` (safe only if no payment gateway features used)
 
 **Note on earlier 260523 log entries:**
@@ -1440,9 +1440,9 @@ finding based on direct API and SSH verification.
 
 **Next actions:**
 1. Resolve `payments` blocker (dashboard install or remove from `required_apps`)
-2. Install cwp: `bench --site test260204.s.frappe.cloud install-app webshop`
+2. Install cws: `bench --site test260204.s.frappe.cloud install-app webshop`
 3. Run `create_website_items.py` patch or bench console script using `make_website_item()` to
    create Website Item records from the 89 items with `published_in_website=1`
 4. Verify `/all-products` renders and cart flow works end-to-end on etest
 
-*Analysis compiled from Frappe Webshop codebase and Comfac Webshop Wiki documentation*
+*Analysis compiled from Frappe Webshop codebase and Comfac Webstore Wiki documentation*

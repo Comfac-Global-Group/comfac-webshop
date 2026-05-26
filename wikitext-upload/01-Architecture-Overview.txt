@@ -1,7 +1,7 @@
 = 01 - Architecture Overview =
 
 '''Parent:''' [Webshop-Index Webshop Index]  
-'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/01-Architecture-Overview Comfac Webshop Wiki - Chapter 01]
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webstore/wiki/01-Architecture-Overview Comfac Webstore Wiki - Chapter 01]
 
 ----
 

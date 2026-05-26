@@ -3,7 +3,7 @@
 '''Parent:''' [Webshop-Index Webshop Index]  
 '''Previous:''' [Webshop-01-Architecture-Overview 01 - Architecture Overview]  
 '''Next:''' [Webshop-03-Shopping-Cart-Quotation-Deep-Dive 03 - Shopping Cart & Quotation Deep Dive]  
-'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/02-DocTypes Comfac Webshop Wiki - Chapter 02]
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webstore/wiki/02-DocTypes Comfac Webstore Wiki - Chapter 02]
 
 ----
 

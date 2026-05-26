@@ -146,8 +146,8 @@ chapters = [
     ),
 ]
 
-source_dir = "/home/justin/opencode260220/comfac-webshop/CIT-Wiki/"
-output_dir = "/home/justin/opencode260220/comfac-webshop/wikitext-upload/"
+source_dir = "/home/justin/opencode260220/comfac-webstore/CIT-Wiki/"
+output_dir = "/home/justin/opencode260220/comfac-webstore/wikitext-upload/"
 
 success_count = 0
 

@@ -2,17 +2,17 @@
 
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [13 - Discount Visibility & Urgency](Webshop-13-Discount-Visibility-and-Urgency)  
-**Source:** [Comfac Webshop Wiki - Chapter 14](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/14-Hypothesis-Discount-Deadline-Visibility)
+**Source:** [Comfac Webstore Wiki - Chapter 14](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/14-Hypothesis-Discount-Deadline-Visibility)
 
 ---
 
 ## Prerequisite: Seamless Baseline First
 
-**This hypothesis is NOT to be executed until the comfac-webshop fork runs seamlessly as a drop-in replacement on a production-like ERPNext instance.**
+**This hypothesis is NOT to be executed until the comfac-webstore fork runs seamlessly as a drop-in replacement on a production-like ERPNext instance.**
 
 **Execution order:**
 
-1. **Phase 0 (Staging Sandbox):** Clone the production ERPNext instance, install comfac-webshop, validate it works identically to the existing webshop. No feature changes. Pass all validation checks.
+1. **Phase 0 (Staging Sandbox):** Clone the production ERPNext instance, install comfac-webstore, validate it works identically to the existing webshop. No feature changes. Pass all validation checks.
 
 2. **Phase 1 (Experiment Clone):** Once Phase 0 is proven stable, clone THAT successful staging instance into a second sandbox. This is where we implement and test the hypothesis below.
 

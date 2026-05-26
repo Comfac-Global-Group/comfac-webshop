@@ -1,13 +1,13 @@
 # Product Requirements Document (PRD)
-# Comfac Webshop - Feature Enhancements
+# Comfac Webstore - Feature Enhancements
 
 **Version:** 1.0  
 **Date:** March 2026  
 **Status:** Draft - Pending Staging Sandbox Validation  
-**Repository:** https://github.com/Comfac-Global-Group/comfac-webshop  
-**Base:** Fork of Frappe Webshop (https://github.com/frappe/webshop). Now Comfac's standalone private fork (`cwp`).
-**Deployment:** GitHub private remote (`comfac-webshop-private`) → Frappe Cloud. Forgejo is local origin; pushed to both manually.
-**Goal:** cwp as the sole webshop engine — no upstream fws installed alongside it. (Pending: remove `payments` from `required_apps`.)
+**Repository:** https://github.com/Comfac-Global-Group/comfac-webstore  
+**Base:** Fork of Frappe Webshop (https://github.com/frappe/webshop). Now Comfac's standalone private fork (`cws`).
+**Deployment:** GitHub private remote (`comfac-webstore-private`) → Frappe Cloud. Forgejo is local origin; pushed to both manually.
+**Goal:** cws as the sole webshop engine — no upstream fws installed alongside it. (Pending: remove `payments` from `required_apps`.)
 
 ---
 
@@ -26,7 +26,7 @@
 
 ### 1.1 Purpose
 
-This document defines the product requirements for new features in Comfac Webshop, an enhanced e-commerce platform built on the Frappe Framework and ERPNext. The enhancements include:
+This document defines the product requirements for new features in Comfac Webstore, an enhanced e-commerce platform built on the Frappe Framework and ERPNext. The enhancements include:
 
 - **Discount visibility** in shopping cart with urgency indicators
 - **System Builder** for multi-component configurable products
@@ -48,7 +48,7 @@ This document defines the product requirements for new features in Comfac Websho
 
 **CRITICAL:** All feature development follows a strict phased approach:
 
-1. **Phase 0 (Staging Sandbox):** Validate that comfac-webshop fork runs identically to base webshop on production-like ERPNext instance
+1. **Phase 0 (Staging Sandbox):** Validate that comfac-webstore fork runs identically to base webshop on production-like ERPNext instance
 2. **Phase 1 (Experiment Clone):** Implement features on cloned sandbox, validate all scenarios
 3. **Phase 2 (Production):** Merge only after Phase 1 validation passes
 
@@ -56,13 +56,13 @@ This document defines the product requirements for new features in Comfac Websho
 
 ---
 
-### 2026-05-23 15:19 — Standalone cwp Deployment Clarification
+### 2026-05-23 15:19 — Standalone cws Deployment Clarification
 
-**cwp (comfac-webshop-private)** is Comfac's private fork of upstream Frappe WebShop (fws).
-The long-term goal is for cwp to function as the sole webshop engine on any bench — upstream fws
+**cws (comfac-webstore-private)** is Comfac's private fork of upstream Frappe WebShop (fws).
+The long-term goal is for cws to function as the sole webshop engine on any bench — upstream fws
 will NOT be installed alongside it.
 
-**What cwp is today (95% fws):**
+**What cws is today (95% fws):**
 - All routing, DocTypes, cart logic, search, checkout inherited unchanged from upstream fws
 - 5% delta = Comfac's UI additions: cart discount display, savings summary, mini-cart price/discount,
   associated CSS
@@ -70,13 +70,13 @@ will NOT be installed alongside it.
 **Current blocker for standalone install:**
 `hooks.py` declares `required_apps = ["payments", "erpnext"]` — unchanged from upstream fws.
 The `payments` app must either be added to the bench, or removed from `required_apps` (if unused),
-before cwp can be installed standalone.
+before cws can be installed standalone.
 
-**Deployment path:** `github-private` remote (`comfac-webshop-private.git`) → Frappe Cloud.
+**Deployment path:** `github-private` remote (`comfac-webstore-private.git`) → Frappe Cloud.
 Forgejo (`git.comfac-it.net`) is the development origin; changes are pushed to both remotes.
 
 **Phase 0 target (etest — t3.comfac-it.com):**
-Install cwp on etest bench, then create Website Item records from the 89 Items that already have
+Install cws on etest bench, then create Website Item records from the 89 Items that already have
 `published_in_website=1`. Use `webshop/patches/create_website_items.py` or a bench console script
 calling `make_website_item()`. Verify `/all-products` and cart flow end-to-end.
 
@@ -686,7 +686,7 @@ def get_cart_discount_details(quotation_name):
 
 - [ANALYSIS.md](./ANALYSIS.md) - Technical analysis of codebase including all wiki chapters
 - [Frappe Webshop Docs](https://docs.erpnext.com/docs/user/manual/en/set_up_e_commerce) - Official ERPNext e-commerce guide
-- [Wiki Home](https://github.com/Comfac-Global-Group/comfac-webshop/wiki) - Original wiki documentation
+- [Wiki Home](https://github.com/Comfac-Global-Group/comfac-webstore/wiki) - Original wiki documentation
 
 ### 6.2 Key Files Reference
 

@@ -1,4 +1,4 @@
-cwp — Comfac WebShop Private
+cws — Comfac WebStore Private
 Version: v0.1.01
 Date: 2026-05-23
 Status: Development — deployed on etest (t3.comfac-it.com)
@@ -15,4 +15,4 @@ Changes in this version:
 - Asset serving fixed (asset.json maps to dist/ path)
 
 Version history:
-v0.1.01 — 2026-05-23 — Initial cwp release on etest
+v0.1.01 — 2026-05-23 — Initial cws release on etest

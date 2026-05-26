@@ -1,17 +1,17 @@
-# cwp Upstream Sync — How to Update from Frappe WebShop
+# cws Upstream Sync — How to Update from Frappe WebShop
 
 **Last updated:** 2026-05-23  
-**Repo:** `work/comfac-webshop` (cwp)  
+**Repo:** `work/comfac-webstore` (cws)  
 **Upstream:** `https://github.com/frappe/webshop` (fws)
 
 ---
 
 ## Background
 
-cwp is 95% identical to upstream Frappe WebShop (fws). Comfac's changes live in exactly
+cws is 95% identical to upstream Frappe WebShop (fws). Comfac's changes live in exactly
 **5 source files**. Everything else is upstream and safe to overwrite.
 
-When fws ships bug fixes or new features, you pull them into cwp by merging upstream into
+When fws ships bug fixes or new features, you pull them into cws by merging upstream into
 `develop`, resolving conflicts in those 5 files, then pushing to all remotes.
 
 ---
@@ -39,7 +39,7 @@ to see exactly what Comfac added.
 The upstream fws remote is NOT in the repo by default. Add it once:
 
 ```bash
-cd work/comfac-webshop
+cd work/comfac-webstore
 git remote add upstream https://github.com/frappe/webshop.git
 git fetch upstream
 ```
@@ -49,9 +49,9 @@ Verify remotes:
 git remote -v
 # upstream   https://github.com/frappe/webshop.git (fetch)
 # upstream   https://github.com/frappe/webshop.git (push)
-# origin     https://git.comfac-it.net/cgg/comfac-webshop.git
-# github     https://...github.com/Comfac-Global-Group/comfac-webshop.git
-# github-private  https://...github.com/Comfac-Global-Group/comfac-webshop-private.git
+# origin     https://git.comfac-it.net/cgg/comfac-webstore.git
+# github     https://...github.com/Comfac-Global-Group/comfac-webstore.git
+# github-private  https://...github.com/Comfac-Global-Group/comfac-webstore-private.git
 ```
 
 ---
@@ -192,10 +192,10 @@ git push github-private develop   # GitHub private — this is Frappe Cloud's so
 
 ## Step 8 — Deploy on Frappe Cloud
 
-Frappe Cloud fetches from `github-private` (`comfac-webshop-private.git`).
+Frappe Cloud fetches from `github-private` (`comfac-webstore-private.git`).
 
 1. Go to `frappecloud.com` → target site (ecit or etest)
-2. Apps → comfac-webshop-private → Deploy
+2. Apps → comfac-webstore-private → Deploy
 3. Wait for deploy to complete
 4. **Assets require a build** — trigger via the Frappe Cloud dashboard (SSH `bench build` causes OOM)
 5. After deploy: SSH into bench → `bench --site <site> clear-cache` to clear Jinja template cache
@@ -214,9 +214,9 @@ For etest, use site `test260204.s.frappe.cloud` and bench user `bench-35107-0000
 
 ## When to Check for Upstream Updates
 
-- Before starting any new cwp feature (avoid building on stale code)
+- Before starting any new cws feature (avoid building on stale code)
 - When fws ships a release tag on GitHub
-- When a bug in cwp might already be fixed upstream
+- When a bug in cws might already be fixed upstream
 
 Check if anything new exists:
 ```bash
@@ -224,7 +224,7 @@ git fetch upstream
 git log --oneline HEAD..upstream/develop | head -10
 ```
 
-If the output is empty, cwp is current.
+If the output is empty, cws is current.
 
 ---
 
@@ -237,9 +237,9 @@ required_apps = ["payments", "erpnext"]   # line 11, hooks.py
 ```
 
 This is unchanged from upstream fws. The long-term goal is to remove `payments` from this list
-so cwp installs standalone. Check whether upstream has already removed it before doing so manually.
+so cws installs standalone. Check whether upstream has already removed it before doing so manually.
 If upstream has removed it, take the upstream version. If not, do not remove it without confirming
-that cwp uses no payment gateway features from the payments app.
+that cws uses no payment gateway features from the payments app.
 
 ---
 

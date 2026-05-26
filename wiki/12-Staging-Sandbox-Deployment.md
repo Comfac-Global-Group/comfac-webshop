@@ -2,7 +2,7 @@
 
 ## Concept: "Comfac Staging Sandbox"
 
-A cloned copy of the production ERPNext instance where we install our custom `comfac-webshop` fork, validate it works identically to the existing webshop, then iterate on new features until they're proven stable before deploying to production.
+A cloned copy of the production ERPNext instance where we install our custom `comfac-webstore` fork, validate it works identically to the existing webshop, then iterate on new features until they're proven stable before deploying to production.
 
 We'll call this process the **Staging Sandbox** - a safe testing ground where we:
 1. Verify the fork is a seamless drop-in replacement
@@ -74,7 +74,7 @@ bench get-app erpnext --branch version-15
 bench get-app payments --branch version-15
 
 # Install our forked webshop INSTEAD of the official one
-bench get-app webshop https://github.com/xunema/comfac-webshop.git
+bench get-app webstore https://github.com/xunema/comfac-webstore.git
 
 # Create site and restore
 bench new-site staging.comfac.com
@@ -110,7 +110,7 @@ If the staging site already has the official webshop installed:
 cd ~/frappe-bench/apps/webshop
 
 # Add our fork as a remote
-git remote add comfac https://github.com/xunema/comfac-webshop.git
+git remote add comfac https://github.com/xunema/comfac-webstore.git
 git fetch comfac
 
 # Check current branch and status
@@ -132,7 +132,7 @@ bench restart
 
 If installing fresh (no existing webshop):
 ```bash
-bench get-app webshop https://github.com/xunema/comfac-webshop.git
+bench get-app webstore https://github.com/xunema/comfac-webstore.git
 bench --site staging.comfac.com install-app webshop
 bench --site staging.comfac.com migrate
 bench build --app webshop
@@ -224,7 +224,7 @@ For each promotion:
 ## Step 6: Iteration Cycle
 
 ```
-1. Make code changes in comfac-webshop fork
+1. Make code changes in comfac-webstore fork
 2. Push to GitHub
 3. On staging: git pull && bench build --app webshop && bench restart
 4. Test the specific feature
@@ -256,7 +256,7 @@ bench --site your-site.com backup --with-files
 
 # Switch to fork
 cd ~/frappe-bench/apps/webshop
-git remote add comfac https://github.com/xunema/comfac-webshop.git
+git remote add comfac https://github.com/xunema/comfac-webstore.git
 git fetch comfac
 git checkout comfac/main
 
