@@ -3,7 +3,7 @@
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [07 - Checkout & Orders](Webshop-07-Checkout-and-Orders)  
 **Next:** [09 - Hooks & Events](Webshop-09-Hooks-and-Events)  
-**Source:** [Comfac Webshop Wiki - Chapter 08](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/08-Templates-and-Frontend)
+**Source:** [Comfac Webstore Wiki - Chapter 08](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/08-Templates-and-Frontend)
 
 ---
 

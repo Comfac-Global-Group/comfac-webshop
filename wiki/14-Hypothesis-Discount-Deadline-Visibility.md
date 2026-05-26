@@ -2,15 +2,15 @@
 
 ## Prerequisite: Seamless Baseline First
 
-**This hypothesis is NOT to be executed until the comfac-webshop fork runs seamlessly as a drop-in replacement on a production-like ERPNext instance.** The execution order is:
+**This hypothesis is NOT to be executed until the comfac-webstore fork runs seamlessly as a drop-in replacement on a production-like ERPNext instance.** The execution order is:
 
-1. **Phase 0 (Staging Sandbox):** Clone the production ERPNext instance, install comfac-webshop, validate it works identically to the existing webshop (see [wiki/12](12-Staging-Sandbox-Deployment.md)). No feature changes. Pass all validation checks.
+1. **Phase 0 (Staging Sandbox):** Clone the production ERPNext instance, install comfac-webstore, validate it works identically to the existing webshop (see [wiki/12](12-Staging-Sandbox-Deployment.md)). No feature changes. Pass all validation checks.
 
 2. **Phase 1 (Experiment Clone):** Once Phase 0 is proven stable, clone THAT successful staging instance into a second sandbox. This is where we implement and test the hypothesis below. If anything breaks, the Phase 0 baseline is untouched.
 
 3. **Phase 2 (Iterate):** Test with sample products, pricing rules, coupons, and deadline-bearing offers on the experiment clone. Validate every scenario. Only when everything passes do we merge back to the main fork.
 
-**Do not skip Phase 0.** The hypothesis below assumes a working, stable comfac-webshop instance as its foundation.
+**Do not skip Phase 0.** The hypothesis below assumes a working, stable comfac-webstore instance as its foundation.
 
 ---
 

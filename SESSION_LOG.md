@@ -1,15 +1,15 @@
-# cwp Session Log
+# cws Session Log
 
 ---
 
 ## Week of 2026-05-19
 
-**Focus:** cwp first install on etest — standalone deploy, cart discount display, RCA
+**Focus:** cws first install on etest — standalone deploy, cart discount display, RCA
 **Overall Status:** 🟢 Cart working end-to-end on etest
 
 ### Completed
 - Removed `payments` from `required_apps` (standalone deploy blocker)
-- Installed cwp on etest via SSH `bench get-app` + `bench install-app`
+- Installed cws on etest via SSH `bench get-app` + `bench install-app`
 - Created 89 Website Items from published Items via `make_website_item()`
 - Configured Webshop Settings (company, price list, enabled)
 - Debugged and fixed `MandatoryError` cart blocker (Quotation custom fields `reqd=1`)
@@ -24,7 +24,7 @@
 - Multi-model verification protocol documented for forked Frappe apps
 
 ### In Progress
-- Awesome Bar: cwp DocTypes not searchable — workspace JSON committed, pending SSH deploy
+- Awesome Bar: cws DocTypes not searchable — workspace JSON committed, pending SSH deploy
 - SSH access to etest blocked ("Too many authentication failures")
 
 ### Blockers
@@ -32,14 +32,14 @@
 
 ### Next Week
 - Resolve SSH access to etest bench
-- `git pull` + `bench migrate` + `clear-cache` on etest → Awesome Bar shows cwp DocTypes
+- `git pull` + `bench migrate` + `clear-cache` on etest → Awesome Bar shows cws DocTypes
 - Apply Quotation `depends_on` fix to ecit before enabling webshop there
 - Complete Webshop Settings filter_fields and filter_attributes replication to etest
 - Begin ecit webshop soft launch preparation
 
 ---
 
-## 2026-05-23 — cwp Install on etest: Full Success Path + Cart Blocker
+## 2026-05-23 — cws Install on etest: Full Success Path + Cart Blocker
 
 **Owner:** OpenCode (install + fix) / Claude (analysis + log)
 **Status:** 🟢 Done — /all-products ✅, Add to Cart ✅ (QTN-CART-00001: Netgate 1100 × 2 = 58,650 PHP), /cart ✅
@@ -47,15 +47,15 @@
 
 ---
 
-### Part A — What Was Done to Install cwp (Detailed Technique)
+### Part A — What Was Done to Install cws (Detailed Technique)
 
-This section is the authoritative record of how cwp was installed on etest for the first time.
+This section is the authoritative record of how cws was installed on etest for the first time.
 Other agents should follow this exact sequence.
 
 #### A1. Remove `payments` from `required_apps` (blocker resolution)
 
 The upstream fws `hooks.py` declares `required_apps = ["payments", "erpnext"]`. The `payments` app
-was not on the etest bench. Attempting `bench install-app webshop` without this change failed with
+was not on the etest bench. Attempting `bench install-app webstore` without this change failed with
 `No module named 'payments'`.
 
 **Fix:** Edit `webshop/hooks.py` line 11:
@@ -67,7 +67,7 @@ required_apps = ["payments", "erpnext"]
 required_apps = ["erpnext"]
 ```
 
-**Verify this change is correct:** Grep the cwp codebase for any imports from `payments`:
+**Verify this change is correct:** Grep the cws codebase for any imports from `payments`:
 ```bash
 grep -rn "from payments\|import payments" webshop/
 ```
@@ -104,7 +104,7 @@ The agents-justin.md table entry `bench-35107-000001-f23-singapore` is WRONG —
 is `test260204.s.frappe.cloud`. Use the internal name in all `bench --site` commands.
 
 ```bash
-echo "bench get-app https://<PAT>@github.com/Comfac-Global-Group/comfac-webshop-private.git; exit" \
+echo "bench get-app https://<PAT>@github.com/Comfac-Global-Group/comfac-webstore-private.git; exit" \
   | ssh -i /home/justin/.ssh/id_ed25519 \
     -o IdentitiesOnly=yes -o RequestTTY=force \
     -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
@@ -113,7 +113,7 @@ echo "bench get-app https://<PAT>@github.com/Comfac-Global-Group/comfac-webshop-
 
 The PAT is embedded in the `github-private` remote URL in the git repo:
 ```bash
-grep 'github-private' /path/to/work/comfac-webshop/.git/config | grep -o 'ghp_[^@]*'
+grep 'github-private' /path/to/work/comfac-webstore/.git/config | grep -o 'ghp_[^@]*'
 ```
 
 #### A4. Install the app for the site
@@ -126,7 +126,7 @@ echo "bench --site test260204.s.frappe.cloud install-app webshop; exit" \
     "bench-35107-000002-f23s@n2-singapore.frappe.cloud" -p 2222 2>&1
 ```
 
-This runs `bench migrate` internally, creating all cwp DocType tables including `Website Item`,
+This runs `bench migrate` internally, creating all cws DocType tables including `Website Item`,
 `Webshop Settings`, `Shopping Cart Settings`, etc.
 
 **Verify install:**
@@ -138,7 +138,7 @@ echo "bench --site test260204.s.frappe.cloud list-apps; exit" \
 
 #### A5. Create 89 Website Items from published Items
 
-cwp introduces the `Website Item` doctype. Items with `published_in_website=1` need a corresponding
+cws introduces the `Website Item` doctype. Items with `published_in_website=1` need a corresponding
 `Website Item` record. The patch `webshop/patches/create_website_items.py` does this.
 
 **Method — bench console via heredoc:**
@@ -356,7 +356,7 @@ Cart backend works (API) but frontend JS doesn't load.
 #### Root Cause
 `hooks.py` declares `web_include_js = "web.bundle.js"`. This bundle file exists in `apps/webshop/webshop/dist/js/web.bundle.WLOGYSZO.js` (built by `bench build`) but Frappe Cloud serves assets from a **CDN**, NOT from the local `sites/.../public/assets/` directory.
 
-Since cwp was installed manually via `bench get-app` + SSH (not through a Frappe Cloud deploy pipeline), the CDN was never populated with the webshop asset bundle. The bundle URL returns 404 → JavaScript never loads → cart icon never renders → product page interactivity is broken.
+Since cws was installed manually via `bench get-app` + SSH (not through a Frappe Cloud deploy pipeline), the CDN was never populated with the webshop asset bundle. The bundle URL returns 404 → JavaScript never loads → cart icon never renders → product page interactivity is broken.
 
 **The lesson:** On Frappe Cloud, the asset bundle pipeline works as:
 ```
@@ -368,7 +368,7 @@ bench build → files in apps/<app>/<app>/dist/
 
 #### Fix Applied
 
-**Short-term fix (committed to cwp):** Switch `web_include_js` from the bundle to individual source files:
+**Short-term fix (committed to cws):** Switch `web_include_js` from the bundle to individual source files:
 
 ```python
 # hooks.py line 16-20
@@ -383,24 +383,24 @@ web_include_js = [
 Individual source files at `apps/webshop/webshop/public/js/` are served directly via the symlink
 `assets/webshop/ → apps/webshop/webshop/public/` — no CDN needed. ✅ Verified: `shopping_cart.js` returns 200.
 
-**Long-term fix:** Trigger a Frappe Cloud deploy for the `comfac-webshop-private` app. This runs the
+**Long-term fix:** Trigger a Frappe Cloud deploy for the `comfac-webstore-private` app. This runs the
 full build pipeline and uploads assets to CDN, making the bundle available.
 
 #### Version Bump
 ```python
 # webshop/__init__.py
-__version__ = '0.1.0'  # was 0.0.1 — first cwp release
+__version__ = '0.1.0'  # was 0.0.1 — first cws release
 ```
 
 ---
 
 ## 2026-05-23 17:30 — Multi-Model Inventory Check Strategy for Forked Frappe Apps
 
-After the cwp installation experience, the team now follows this **post-copy verification protocol**
+After the cws installation experience, the team now follows this **post-copy verification protocol**
 when forking a Frappe app:
 
 ### The Problem
-When you fork a Frappe app (e.g., `frappe/webshop` → `cwp`), a single agent/model may miss
+When you fork a Frappe app (e.g., `frappe/webshop` → `cws`), a single agent/model may miss
 critical differences between the upstream and the fork, especially:
 - Asset serving changes in the new environment (Frappe Cloud vs. self-hosted)
 - `hooks.py` differences (`required_apps`, `web_include_js`, `web_include_css`)
@@ -419,7 +419,7 @@ critical differences between the upstream and the fork, especially:
 | 5 | DeepSeek | **Dependency graph** | All imports, patches, and their transitive dependencies |
 | 6 | Human | **Manual E2E** | Cart flow, checkout, product browse — visual verification |
 
-### Applied to cwp
+### Applied to cws
 | Pass | Finding | Action |
 |------|---------|--------|
 | 1 | 5 files changed (cart templates + SCSS) | ✅ Already documented in UPSTREAM-SYNC.md |
@@ -451,11 +451,11 @@ and Frappe Cloud operations:
 | # | Skill | How to Learn | Priority |
 |---|-------|-------------|----------|
 | 1 | **Bench CLI** — `get-app`, `install-app`, `migrate`, `build`, `clear-cache`, `console`, `execute` | Practice on etest | 🔴 Required |
-| 2 | **GitHub private repo deployment** — Add PAT to remote URL, push, Frappe Cloud Deploy | cwp deployment on etest | 🔴 Required |
+| 2 | **GitHub private repo deployment** — Add PAT to remote URL, push, Frappe Cloud Deploy | cws deployment on etest | 🔴 Required |
 | 3 | **SSH cert auth to Frappe Cloud** — Install cert from BRC, `-o RequestTTY=force`, pipe pattern | agents-justin.md SSH section | 🔴 Required |
 | 4 | **hooks.py audit** — Check `required_apps`, `web_include_*`, `override_doctype_class`, `doc_events` | Pass 2 of verification protocol | 🟡 Important |
-| 5 | **Asset serving** — Frappe Cloud CDN vs local filesystem, `dist/` vs `public/`, asset.json | cwp cart icon RCA | 🟡 Important |
-| 6 | **Multi-model verification** — 6-pass protocol before deploying any fork | cwp deployment | 🟢 Practice |
+| 5 | **Asset serving** — Frappe Cloud CDN vs local filesystem, `dist/` vs `public/`, asset.json | cws cart icon RCA | 🟡 Important |
+| 6 | **Multi-model verification** — 6-pass protocol before deploying any fork | cws deployment | 🟢 Practice |
 | 7 | **Self-hosted Docker ERPNext** — Docker Compose setup, bench proxy setup, NGINX config | Future project | 🟢 Future |
 | 8 | **Frappe Cloud → Local Docker instance cloning** — Download Frappe Cloud site + DB to local Docker for rapid, destructive testing. Piloted by Denzel, Mike, Mathew in the plant. Enables agent-controlled testing without risk to production. | Plant pilot in progress | 🔴 Required |
 
@@ -466,7 +466,7 @@ and Frappe Cloud operations:
 | etest internal site name | `test260204.s.frappe.cloud` |
 | etest custom domain | `t3.comfac-it.com` |
 | etest SSH user | `bench-35107-000002-f23s` (NOT `bench-35107-000001-f23-singapore`) |
-| cwp deploy source | `github-private` → `comfac-webshop-private.git` |
+| cws deploy source | `github-private` → `comfac-webstore-private.git` |
 | Cart Python method | `webshop.webshop.shopping_cart.cart.update_cart` (NOT `add_to_cart`) |
 | Webshop Settings check | Use `frappe.client.get`, not `api/resource` (ProgrammingError) |
 | Cart blocker field 1 | `custom_scope_of_works` on Quotation — was `reqd=1`, no condition |
@@ -499,7 +499,7 @@ and Frappe Cloud operations:
 | Shipping Address section | ✅ | "Add a new address" |
 | Past Quotes / Continue Shopping | ✅ | Bottom of items panel |
 
-The cwp 5% delta (cart discount display) is **fully confirmed working**.
+The cws 5% delta (cart discount display) is **fully confirmed working**.
 
 ---
 
@@ -513,7 +513,7 @@ icons (cart, heart), empty product grid, text-only layout.
 | # | Cause | Detail |
 |---|-------|--------|
 | 1 | Bundle not served | `web.bundle.js` and `webshop-web.bundle.css` require compiled dist/ files. Manual `bench install-app` does NOT run `bench build`. |
-| 2 | No bench build on install | When cwp was installed via SSH `bench get-app` + `bench install-app`, `bench build` was never explicitly run. dist/ files may not have existed. |
+| 2 | No bench build on install | When cws was installed via SSH `bench get-app` + `bench install-app`, `bench build` was never explicitly run. dist/ files may not have existed. |
 | 3 | asset.json gap | Frappe resolves bundle filenames through `asset.json` on the bench. Without it, bundle URLs 404. |
 | 4 | Fallback list was incomplete | The commented-out individual source file fallback in hooks.py listed `init.js`, `shopping_cart.js`, `wishlist.js`, `customer_reviews.js` — but was **missing `product_ui/grid.js`, `product_ui/list.js`, `product_ui/search.js`, `product_ui/views.js`**. Even if used, the product grid would still be empty. |
 | 5 | Settings confusion | `login_required_to_view_products: 1` was set on etest (not on ecit). This alone would block the product grid for anonymous users regardless of JS loading. |
@@ -568,20 +568,20 @@ as a fixture easily. During ecit → etest replication, these settings were not 
 ### RCA Part 3 — Recurring Theme: Feature Loss on Deploy
 
 **Pattern observed (3rd occurrence this session):**
-Every cwp deploy or settings change has caused unexpected feature regression. The root cause
+Every cws deploy or settings change has caused unexpected feature regression. The root cause
 is always one of:
 1. Settings not synced from ecit → etest
 2. Asset bundles not built/served after code deploy
 3. A Frappe conditional (mandatory_depends_on vs depends_on) misunderstood
 
 **CWP PRINCIPLE (must be internalized):**
-> cwp never adds new data sources. It only DISPLAYS information that Frappe already
+> cws never adds new data sources. It only DISPLAYS information that Frappe already
 > provides on the quotation/cart line items (discount_percentage, price_list_rate, rate,
 > amount, taxes_and_charges). The upstream fws already has these fields on the quotation.
-> cwp's 5% delta is purely cosmetic template changes to show them.
+> cws's 5% delta is purely cosmetic template changes to show them.
 
-**Corollary:** If something isn't showing in cwp that should be there, the cause is NEVER
-in cwp's template logic. It is ALWAYS in:
+**Corollary:** If something isn't showing in cws that should be there, the cause is NEVER
+in cws's template logic. It is ALWAYS in:
 - Settings (Webshop Settings not configured correctly)
 - Data (item doesn't have a discount/pricing rule applied)
 - Assets (CSS/JS not loaded, so styling/interactivity is absent)
@@ -598,14 +598,14 @@ Before every etest or ecit deploy:
 | 4 | Route smoke test | /all-products → /item-page → /cart → Request for Quote |
 | 5 | Discount visible | Add a discounted item; verify strikethrough + badge + savings |
 | 6 | VAT applied | Cart total includes tax row |
-| 7 | fws feature parity | Everything fws shows, cwp shows + discount additions |
+| 7 | fws feature parity | Everything fws shows, cws shows + discount additions |
 
 ---
 
-## 2026-05-23 18:00 — Awesome Bar: cwp DocTypes Not Searchable
+## 2026-05-23 18:00 — Awesome Bar: cws DocTypes Not Searchable
 
 **Owner:** Claude (analysis + log)
-**Status:** 🟡 Open — cwp DocTypes invisible in Awesome Bar and module panel
+**Status:** 🟡 Open — cws DocTypes invisible in Awesome Bar and module panel
 
 ### Part D — Awesome Bar Gap: Webshop Module Not Registered on Desk
 
@@ -616,7 +616,7 @@ specific DocType names like "Website Item" or "Webshop Settings" also returns no
 
 On the upstream fws (Frappe WebShop) installed on ecit, the same search does surface results.
 
-#### cwp DocTypes (all module=Webshop)
+#### cws DocTypes (all module=Webshop)
 
 | DocType | Notes |
 |---------|-------|
@@ -630,20 +630,20 @@ On the upstream fws (Frappe WebShop) installed on ecit, the same search does sur
 | Website Item Tabbed Section | Tabbed content sections on product pages |
 | Website Offer | Promotional banners or discount offers |
 
-#### cwp Web Routes (www/)
+#### cws Web Routes (www/)
 
 | Route | Files | Notes |
 |-------|-------|-------|
 | `/all-products` | `www/all-products/index.py`, `index.html`, `not_found.html` | Main product grid |
 | `/shop-by-category` | `www/shop-by-category/index.py`, `index.html` | Category browsing |
 
-#### cwp Desk Pages
+#### cws Desk Pages
 
 **None.** `find webshop -name "*.json" -path "*/page/*"` returns empty. No desk pages registered.
 
-#### Root Cause (confirmed from cwp source)
+#### Root Cause (confirmed from cws source)
 
-cwp has `modules.txt` containing "Webshop" — the Module Def record is created on `bench install-app`.
+cws has `modules.txt` containing "Webshop" — the Module Def record is created on `bench install-app`.
 
 **The missing piece:** `webshop/workspace/webshop.json` was **added in the v0.1.0 commit** (today,
 same commit as the `web_include_js` asset fix). This workspace JSON is what registers the Webshop
@@ -651,7 +651,7 @@ module on the ERPNext desk and makes its DocTypes appear in Awesome Bar.
 
 However, etest was blocked on SSH (Frappe Cloud gateway was down) when that fix was committed — the
 bench never received a `git pull` for the v0.1.0 code. The etest bench is still running the pre-v0.1.0
-cwp code, which has no workspace JSON. Without the Workspace record, the Webshop module is invisible
+cws code, which has no workspace JSON. Without the Workspace record, the Webshop module is invisible
 to Awesome Bar even though the Module Def exists.
 
 The workspace JSON is fully written and correct:
@@ -683,7 +683,7 @@ curl -s -H "Authorization: $AUTH" \
 | Check | Status |
 |-------|--------|
 | Webshop Module Def in DB | ✅ Exists (app=webshop, from modules.txt) |
-| Workspace JSON in cwp source | ✅ `webshop/workspace/webshop.json` — committed v0.1.0 |
+| Workspace JSON in cws source | ✅ `webshop/workspace/webshop.json` — committed v0.1.0 |
 | Workspace pushed to all remotes | ✅ origin (Forgejo), github, github-private |
 | hooks.py publisher | ✅ Updated to Comfac Global Group |
 | Version | ✅ v0.1.01 |
@@ -709,14 +709,14 @@ supervisorctl restart frappe-bench-web:
 
 After these steps:
 - Webshop module appears in the left panel
-- cwp DocTypes (Website Item, Webshop Settings, etc.) appear in Awesome Bar
+- cws DocTypes (Website Item, Webshop Settings, etc.) appear in Awesome Bar
 - Cart icon and product grid should load (JS bundle served from dist/)
 
 | Step | Owner | Priority |
 |------|-------|----------|
 | Resolve Frappe Cloud SSH auth ("Too many authentication failures") | Human / OpenCode | 🔴 Blocker |
 | `git pull` + `bench migrate` + `clear-cache` on etest | Agent (once SSH available) | 🔴 Next |
-| Verify Awesome Bar shows cwp DocTypes | Human | 🔴 Verify |
+| Verify Awesome Bar shows cws DocTypes | Human | 🔴 Verify |
 | Verify cart icon visible on `/all-products` | Human | 🔴 Verify |
 
 ---
@@ -747,6 +747,6 @@ bundle path. Behaviour depends on deploy method:
   uncomment if SSH-only deploy is unavoidable.
 
 **Version: 0.1.01** — non-standard zero-padded PATCH. Python parses as `0.1.1`. No functional
-impact (cwp not distributed via PyPI), but worth standardising to `0.1.1` in a future cleanup.
+impact (cws not distributed via PyPI), but worth standardising to `0.1.1` in a future cleanup.
 
 **Verdict: ready to deploy via Frappe Cloud dashboard once SSH gateway is available for migrate.**

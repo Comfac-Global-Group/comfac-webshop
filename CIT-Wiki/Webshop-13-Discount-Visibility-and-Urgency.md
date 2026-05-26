@@ -3,7 +3,7 @@
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [12 - Staging Sandbox Deployment](Webshop-12-Staging-Sandbox-Deployment)  
 **Next:** [14 - Hypothesis: Discount Deadline Visibility](Webshop-14-Hypothesis-Discount-Deadline-Visibility)  
-**Source:** [Comfac Webshop Wiki - Chapter 13](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/13-Discount-Visibility-and-Urgency)
+**Source:** [Comfac Webstore Wiki - Chapter 13](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/13-Discount-Visibility-and-Urgency)
 
 ---
 

@@ -1,8 +1,8 @@
-# Comfac Webshop
+# Comfac Webstore
 
 **Open Source E-commerce Platform with Enhanced Discount Visibility & System Builder**
 
-[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/Comfac-Global-Group/comfac-webshop)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?logo=github)](https://github.com/Comfac-Global-Group/comfac-webstore)
 [![Base Project](https://img.shields.io/badge/Base-Frappe%20Webshop-green)](https://github.com/frappe/webshop)
 [![ERPNext](https://img.shields.io/badge/Powered%20by-ERPNext-orange)](https://erpnext.com)
 
@@ -12,7 +12,7 @@
 
 | Resource | Link | Description |
 |----------|------|-------------|
-| **GitHub Repository** | [Comfac-Global-Group/comfac-webshop](https://github.com/Comfac-Global-Group/comfac-webshop) | Source code, issues, and pull requests |
+| **GitHub Repository** | [Comfac-Global-Group/comfac-webstore](https://github.com/Comfac-Global-Group/comfac-webstore) | Source code, issues, and pull requests |
 | **Base Project** | [frappe/webshop](https://github.com/frappe/webshop) | Upstream Frappe Webshop project |
 | **ERPNext Docs** | [E-commerce Setup Guide](https://docs.erpnext.com/docs/user/manual/en/set_up_e_commerce) | Official ERPNext e-commerce documentation |
 | **Frappe Framework** | [frappe.io](https://frappe.io) | Framework documentation |
@@ -21,7 +21,7 @@
 
 ## Project Overview
 
-Comfac Webshop is a **fork of Frappe Webshop** customized for Comfac Global Group's needs. It extends the base e-commerce platform with two major feature areas:
+Comfac Webstore is a **fork of Frappe Webshop** customized for Comfac Global Group's needs. It extends the base e-commerce platform with two major feature areas:
 
 ### 🎯 Key Enhancements
 
@@ -184,7 +184,7 @@ Guidelines for testing and implementing features:
 **Before ANY feature work:**
 
 1. Clone production ERPNext instance to staging
-2. Install comfac-webshop fork on staging
+2. Install comfac-webstore fork on staging
 3. Validate seamless replacement:
    - Site loads without errors
    - Product listing works
@@ -253,7 +253,7 @@ The ERPNext pricing engine does all the heavy lifting.
 ## Repository Structure
 
 ```
-comfac-webshop/
+comfac-webstore/
 ├── README.md                          # Project overview
 ├── LICENSE                            # GNU GPL v3
 ├── pyproject.toml                     # Package config (Flit)
@@ -360,7 +360,7 @@ When asking an AI (like Claude Code) to modify the webshop:
 
 **Example prompt:**
 ```
-Help me implement cart discount visibility in the Comfac Webshop. 
+Help me implement cart discount visibility in the Comfac Webstore. 
 
 See the technical analysis at:
 - ANALYSIS.md#10---feature-gap-cart-discounts-from-wiki for what needs to change
@@ -395,7 +395,7 @@ All these fields already exist on the Quotation - we just need to show them.
 
 ### Comfac Resources
 
-- [Comfac Webshop Repository](https://github.com/Comfac-Global-Group/comfac-webshop)
+- [Comfac Webstore Repository](https://github.com/Comfac-Global-Group/comfac-webstore)
 - [Comfac Global Group](https://github.com/Comfac-Global-Group)
 
 ---
@@ -409,4 +409,4 @@ All these fields already exist on the Quotation - we just need to show them.
 
 ---
 
-**Navigation:** [ANALYSIS.md](ANALYSIS.md) (Technical Analysis) | [PRD.md](PRD.md) (Requirements) | [GitHub](https://github.com/Comfac-Global-Group/comfac-webshop)
+**Navigation:** [ANALYSIS.md](ANALYSIS.md) (Technical Analysis) | [PRD.md](PRD.md) (Requirements) | [GitHub](https://github.com/Comfac-Global-Group/comfac-webstore)

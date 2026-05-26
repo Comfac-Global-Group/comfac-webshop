@@ -1,7 +1,7 @@
 # 01 - Architecture Overview
 
 **Parent:** [Webshop Index](Webshop-Index)  
-**Source:** [Comfac Webshop Wiki - Chapter 01](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/01-Architecture-Overview)
+**Source:** [Comfac Webstore Wiki - Chapter 01](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/01-Architecture-Overview)
 
 ---
 

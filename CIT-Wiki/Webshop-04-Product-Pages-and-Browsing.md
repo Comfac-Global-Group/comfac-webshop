@@ -3,7 +3,7 @@
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [03 - Shopping Cart & Quotation Deep Dive](Webshop-03-Shopping-Cart-Quotation-Deep-Dive)  
 **Next:** [05 - Variant Selector](Webshop-05-Variant-Selector)  
-**Source:** [Comfac Webshop Wiki - Chapter 04](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/04-Product-Pages-and-Browsing)
+**Source:** [Comfac Webstore Wiki - Chapter 04](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/04-Product-Pages-and-Browsing)
 
 ---
 

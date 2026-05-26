@@ -3,7 +3,7 @@
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [09 - Hooks & Events](Webshop-09-Hooks-and-Events)  
 **Next:** [11 - Feature Plan: System Builder](Webshop-11-Feature-Plan-System-Builder)  
-**Source:** [Comfac Webshop Wiki - Chapter 10](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/10-Feature-Gap-Cart-Discounts)
+**Source:** [Comfac Webstore Wiki - Chapter 10](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/10-Feature-Gap-Cart-Discounts)
 
 **Status:** 🔴 Not Implemented | **Priority:** High
 

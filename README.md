@@ -67,7 +67,7 @@ Frappe Webshop is an Open Source eCommerce Platform, developed primarily using P
 3. Once ERPNext is installed, add the webshop app to your bench by running
 
     ```sh
-    $ bench get-app webshop
+    $ bench get-app webstore
     ```
 4. After that, you can install the webshop app on the required site by running
     ```sh

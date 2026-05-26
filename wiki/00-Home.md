@@ -1,4 +1,4 @@
-# Comfac Webshop Wiki
+# Comfac Webstore Wiki
 
 ## Purpose
 
@@ -18,7 +18,7 @@ This wiki is designed to work **hand-in-hand with AI agents** (like Claude Code)
 
 ## Overview
 
-Comfac Webshop is a **Frappe/ERPNext app** that provides an open-source e-commerce storefront. It extends ERPNext's selling module (Quotation, Sales Order) with a customer-facing web shop including product browsing, variant selection, shopping cart, checkout, wishlists, and coupon support.
+Comfac Webstore is a **Frappe/ERPNext app** that provides an open-source e-commerce storefront. It extends ERPNext's selling module (Quotation, Sales Order) with a customer-facing web shop including product browsing, variant selection, shopping cart, checkout, wishlists, and coupon support.
 
 This is a **fork** of the official [Frappe Webshop](https://github.com/frappe/webshop), customized for Comfac's needs with planned enhancements around discount visibility and a System Builder configurator.
 
@@ -64,7 +64,7 @@ This is a **fork** of the official [Frappe Webshop](https://github.com/frappe/we
 ## Key Directories
 
 ```
-comfac-webshop/
+comfac-webstore/
   wiki/                               # THIS WIKI - documentation for contributors
   webshop/
     hooks.py                          # App hooks, doc_events, overrides

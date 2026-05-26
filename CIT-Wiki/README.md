@@ -1,6 +1,6 @@
-# CIT Wiki Documentation - Comfac Webshop
+# CIT Wiki Documentation - Comfac Webstore
 
-This folder contains the complete CIT Wiki documentation for the Comfac Webshop project.
+This folder contains the complete CIT Wiki documentation for the Comfac Webstore project.
 
 ## File Structure
 
@@ -90,7 +90,7 @@ The discount visibility feature requires only:
 - **Home.md** - Repository navigation hub
 
 ### External
-- [GitHub Repository](https://github.com/Comfac-Global-Group/comfac-webshop)
+- [GitHub Repository](https://github.com/Comfac-Global-Group/comfac-webstore)
 - [Base Project: Frappe Webshop](https://github.com/frappe/webshop)
 - [ERPNext Documentation](https://docs.erpnext.com)
 
@@ -114,4 +114,4 @@ When updating code:
 ---
 
 **Last Updated:** March 2026  
-**Source:** https://github.com/Comfac-Global-Group/comfac-webshop
+**Source:** https://github.com/Comfac-Global-Group/comfac-webstore

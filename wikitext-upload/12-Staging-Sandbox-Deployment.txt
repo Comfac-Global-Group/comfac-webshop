@@ -3,7 +3,7 @@
 '''Parent:''' [Webshop-Index Webshop Index]  
 '''Previous:''' [Webshop-11-Feature-Plan-System-Builder 11 - Feature Plan: System Builder]  
 '''Next:''' [Webshop-13-Discount-Visibility-and-Urgency 13 - Discount Visibility & Urgency]  
-'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webshop/wiki/12-Staging-Sandbox-Deployment Comfac Webshop Wiki - Chapter 12]
+'''Source:''' [https://github.com/Comfac-Global-Group/comfac-webstore/wiki/12-Staging-Sandbox-Deployment Comfac Webstore Wiki - Chapter 12]
 
 ----
 
@@ -11,13 +11,13 @@
 
 Create an isolated environment to:
 1. Clone production ERPNext instance
-2. Install comfac-webshop fork
+2. Install comfac-webstore fork
 3. Validate seamless replacement of existing webshop
 4. Test new features without affecting production
 
 == Phase 0: Baseline Validation ==
 
-'''Objective:''' Verify comfac-webshop fork runs identically to base webshop
+'''Objective:''' Verify comfac-webstore fork runs identically to base webshop
 
 === Steps ===
 
@@ -34,8 +34,8 @@ bench --site staging-site restore production-site_backup.sql
 #### 2. Install Fork
 
 <pre>bash
-= Get comfac-webshop =
-bench get-app https://github.com/Comfac-Global-Group/comfac-webshop.git
+= Get comfac-webstore =
+bench get-app https://github.com/Comfac-Global-Group/comfac-webstore.git
 
 = Install on staging site =
 bench --site staging-site install-app webshop
