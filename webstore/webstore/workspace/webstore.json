@@ -60,7 +60,7 @@
    "is_query_report": 0,
    "label": "Settings",
    "link_count": 0,
-   "link_to": "Webstore Settings",
+   "link_to": "Webshop Settings",
    "link_type": "DocType",
    "onboard": 1,
    "type": "Card Break"
@@ -68,9 +68,9 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Webstore Settings",
+   "label": "Webshop Settings",
    "link_count": 0,
-   "link_to": "Webstore Settings",
+   "link_to": "Webshop Settings",
    "link_type": "DocType",
    "onboard": 1,
    "type": "Link"
@@ -114,8 +114,8 @@
    "doc_view": "",
    "format": "",
    "icon": "shop",
-   "label": "Webstore Settings",
-   "link_to": "Webstore Settings",
+   "label": "Webshop Settings",
+   "link_to": "Webshop Settings",
    "stats_filter": "",
    "type": "DocType",
    "url": ""

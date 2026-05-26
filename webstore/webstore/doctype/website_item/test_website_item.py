@@ -195,7 +195,7 @@ class TestWebsiteItem(unittest.TestCase):
 
 		breadcrumbs = get_parent_item_groups(item.item_group)
 
-		settings = frappe.get_cached_doc("Webstore Settings")
+		settings = frappe.get_cached_doc("Webshop Settings")
 		if settings.enable_field_filters:
 			base_breadcrumb = "Shop by Category"
 		else:

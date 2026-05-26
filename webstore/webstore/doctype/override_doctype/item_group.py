@@ -50,7 +50,7 @@ class WebstoreItemGroup(ItemGroup, WebsiteGenerator):
 		context.show_search = True
 		context.body_class = "product-page"
 		context.page_length = (
-			cint(frappe.db.get_single_value("Webstore Settings", "products_per_page")) or 6
+			cint(frappe.db.get_single_value("Webshop Settings", "products_per_page")) or 6
 		)
 		context.search_link = "/product_search"
 
@@ -97,7 +97,7 @@ def get_item_for_list_in_html(context):
 
 
 def get_parent_item_groups(item_group_name, from_item=False):
-	settings = frappe.get_cached_doc("Webstore Settings")
+	settings = frappe.get_cached_doc("Webshop Settings")
 
 	if settings.enable_field_filters:
 		base_nav_page = {"name": _("Shop by Category"), "route": "/shop-by-category"}

@@ -31,7 +31,7 @@ class TestItemGroupProductDataEngine(unittest.TestCase):
 		frappe.db.set_value("Item Group", "_Test Item Group B - 1", "show_in_website", 1)
 		frappe.db.set_value("Item Group", "_Test Item Group B - 2", "show_in_website", 1)
 
-		frappe.db.set_single_value("Webstore Settings", "products_per_page", 10)
+		frappe.db.set_single_value("Webshop Settings", "products_per_page", 10)
 
 	def tearDown(self):
 		frappe.db.rollback()

@@ -20,7 +20,7 @@ class PaymentRequest(OriginalPaymentRequest):
         if frappe.local.session.user == "Guest":
             return
 
-        cart_settings = frappe.get_doc("Webstore Settings")
+        cart_settings = frappe.get_doc("Webshop Settings")
 
         if not cart_settings.enabled:
             return
@@ -46,6 +46,6 @@ class PaymentRequest(OriginalPaymentRequest):
         if args.order_type != "Shopping Cart":
             return super().get_gateway_details(args)
 
-        cart_settings = frappe.get_doc("Webstore Settings")
+        cart_settings = frappe.get_doc("Webshop Settings")
         gateway_account = cart_settings.payment_gateway_account
         return super().get_payment_gateway_account(gateway_account)

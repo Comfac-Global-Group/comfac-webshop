@@ -42,7 +42,7 @@ def execute():
 
 		return table_multiselect_data
 
-	settings_doctype = "E Commerce Settings" if has_ecommerce_fields() else "Webstore Settings"
+	settings_doctype = "E Commerce Settings" if has_ecommerce_fields() else "Webshop Settings"
 
 	settings = frappe.get_doc(settings_doctype)
 

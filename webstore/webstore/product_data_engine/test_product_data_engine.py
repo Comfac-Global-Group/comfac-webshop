@@ -300,7 +300,7 @@ class TestProductDataEngine(unittest.TestCase):
 			"Website Item", {"item_code": "Test 12I Laptop"}, "supplier", "_Test Supplier 1"
 		)
 
-		settings = frappe.get_doc("Webstore Settings")
+		settings = frappe.get_doc("Webshop Settings")
 		settings.append("filter_fields", {"fieldname": "supplier"})
 		settings.save()
 

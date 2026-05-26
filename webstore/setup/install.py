@@ -25,7 +25,7 @@ def copy_from_ecommerce_settings():
 	qb = frappe.qb
 	table = frappe.qb.Table("tabSingles")
 	old_doctype = "E Commerce Settings"
-	new_doctype = "Webstore Settings"
+	new_doctype = "Webshop Settings"
 
 	entries = (
 		qb.from_(table)

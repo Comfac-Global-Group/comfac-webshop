@@ -35,7 +35,7 @@ def execute():
 		"save_quotations_as_draft",
 	]
 
-	settings_doctype = "E Commerce Settings" if has_ecommerce_fields() else "Webstore Settings"
+	settings_doctype = "E Commerce Settings" if has_ecommerce_fields() else "Webshop Settings"
 
 	settings = frappe.get_doc(settings_doctype)
 

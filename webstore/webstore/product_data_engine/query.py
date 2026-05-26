@@ -21,7 +21,7 @@ class ProductQuery:
 	"""
 
 	def __init__(self):
-		self.settings = frappe.get_doc("Webstore Settings")
+		self.settings = frappe.get_doc("Webshop Settings")
 		self.page_length = self.settings.products_per_page or 20
 
 		self.or_filters = []

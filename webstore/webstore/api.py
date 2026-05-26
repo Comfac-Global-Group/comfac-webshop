@@ -86,4 +86,4 @@ def get_product_filter_data(query_args=None):
 
 @frappe.whitelist(allow_guest=True)
 def get_guest_redirect_on_action():
-	return frappe.db.get_single_value("Webstore Settings", "redirect_on_action")
+	return frappe.db.get_single_value("Webshop Settings", "redirect_on_action")

@@ -557,7 +557,7 @@ def has_website_permission_for_website_item(doc, ptype, user, verbose=False):
 	if frappe.has_permission("Website Item", ptype=ptype, doc=doc, user=user):
 		return True
 
-	if not frappe.db.get_single_value("Webstore Settings", "login_required_to_view_products"):
+	if not frappe.db.get_single_value("Webshop Settings", "login_required_to_view_products"):
 		return True
 
 	return False
@@ -571,7 +571,7 @@ def has_website_permission_for_item_group(doc, ptype, user, verbose=False):
 	if frappe.has_permission("Item Group", ptype=ptype, doc=doc, user=user):
 		return True
 
-	if not frappe.db.get_single_value("Webstore Settings", "login_required_to_view_products"):
+	if not frappe.db.get_single_value("Webshop Settings", "login_required_to_view_products"):
 		return True
 
 	return False

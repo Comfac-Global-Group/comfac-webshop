@@ -19,8 +19,8 @@ frappe.ui.form.on('Website Item', {
 			frappe.set_route("query-report", "Stock Balance");
 		}, __("View"));
 
-		frm.add_custom_button(__("Webstore Settings"), function() {
-			frappe.set_route("Form", "Webstore Settings");
+		frm.add_custom_button(__("Webshop Settings"), function() {
+			frappe.set_route("Form", "Webshop Settings");
 		}, __("View"));
 	},
 

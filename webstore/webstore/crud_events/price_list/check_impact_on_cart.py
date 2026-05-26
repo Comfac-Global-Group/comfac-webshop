@@ -14,7 +14,7 @@ def execute(doc, method=None):
     doc_before_save = doc.get_doc_before_save()
     currency_changed = doc.currency != doc_before_save.currency
     affects_cart = doc.name == frappe.get_cached_value(
-        "Webstore Settings", None, "price_list"
+        "Webshop Settings", None, "price_list"
     )
 
     if currency_changed and affects_cart:

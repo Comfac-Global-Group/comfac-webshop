@@ -22,7 +22,7 @@ class WebsitePriceListMissingError(frappe.ValidationError):
 
 
 def set_cart_count(quotation=None):
-	if cint(frappe.db.get_singles_value("Webstore Settings", "enabled")):
+	if cint(frappe.db.get_singles_value("Webshop Settings", "enabled")):
 		if not quotation:
 			quotation = _get_cart_quotation()
 		cart_count = cstr(cint(quotation.get("total_qty")))
@@ -50,7 +50,7 @@ def get_cart_quotation(doc=None):
 		"shipping_addresses": get_shipping_addresses(party),
 		"billing_addresses": get_billing_addresses(party),
 		"shipping_rules": get_applicable_shipping_rules(party),
-		"cart_settings": frappe.get_cached_doc("Webstore Settings"),
+		"cart_settings": frappe.get_cached_doc("Webshop Settings"),
 	}
 
 
@@ -89,7 +89,7 @@ def get_billing_addresses(party=None):
 @frappe.whitelist()
 def place_order():
 	quotation = _get_cart_quotation()
-	cart_settings = frappe.get_cached_doc("Webstore Settings")
+	cart_settings = frappe.get_cached_doc("Webshop Settings")
 	quotation.company = cart_settings.company
 
 	quotation.flags.ignore_permissions = True
@@ -387,7 +387,7 @@ def _get_cart_quotation(party=None):
 	if quotation:
 		qdoc = frappe.get_doc("Quotation", quotation[0].name)
 	else:
-		company = frappe.db.get_single_value("Webstore Settings", "company")
+		company = frappe.db.get_single_value("Webshop Settings", "company")
 		qdoc = frappe.get_doc(
 			{
 				"doctype": "Quotation",
@@ -449,7 +449,7 @@ def apply_cart_settings(party=None, quotation=None):
 	if not quotation:
 		quotation = _get_cart_quotation(party)
 
-	cart_settings = frappe.get_cached_doc("Webstore Settings")
+	cart_settings = frappe.get_cached_doc("Webshop Settings")
 
 	set_price_list_and_rate(quotation, cart_settings)
 
@@ -547,7 +547,7 @@ def get_party(user=None):
 			party_doctype = contact.links[0].link_doctype
 			party = contact.links[0].link_name
 
-	cart_settings = frappe.get_cached_doc("Webstore Settings")
+	cart_settings = frappe.get_cached_doc("Webshop Settings")
 
 	debtors_account = ""
 

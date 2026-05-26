@@ -10,7 +10,7 @@ def execute(doc, method=None):
     if doc.use_for_shopping_cart:
         return
 
-    is_enabled = cint(frappe.db.get_single_value("Webstore Settings", "enabled"))
+    is_enabled = cint(frappe.db.get_single_value("Webshop Settings", "enabled"))
 
     if not is_enabled:
         return

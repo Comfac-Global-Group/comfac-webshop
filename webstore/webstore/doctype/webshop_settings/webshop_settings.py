@@ -35,10 +35,10 @@ class WebstoreSettings(Document):
 		if self.enabled:
 			self.validate_price_list_exchange_rate()
 
-		frappe.clear_document_cache("Webstore Settings", "Webstore Settings")
+		frappe.clear_document_cache("Webshop Settings", "Webshop Settings")
 
 		self.is_redisearch_enabled_pre_save = frappe.db.get_single_value(
-			"Webstore Settings", "is_redisearch_enabled"
+			"Webshop Settings", "is_redisearch_enabled"
 		)
 
 	def after_save(self):
@@ -160,11 +160,11 @@ class WebstoreSettings(Document):
 
 
 def validate_cart_settings(doc=None, method=None):
-	frappe.get_doc("Webstore Settings", "Webstore Settings").run_method("validate")
+	frappe.get_doc("Webshop Settings", "Webshop Settings").run_method("validate")
 
 
 def get_shopping_cart_settings():
-	return frappe.get_cached_doc("Webstore Settings")
+	return frappe.get_cached_doc("Webshop Settings")
 
 
 @frappe.whitelist(allow_guest=True)

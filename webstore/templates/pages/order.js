@@ -39,7 +39,7 @@ frappe.ready(() => {
 				loyalty_points,
 			}
 
-			const payment_gateway_account = await frappe.db.get_single_value('Webstore Settings', 'payment_gateway_account')
+			const payment_gateway_account = await frappe.db.get_single_value('Webshop Settings', 'payment_gateway_account')
 
 			if (payment_gateway_account) {
 				args_obj.payment_gateway_account = payment_gateway_account;

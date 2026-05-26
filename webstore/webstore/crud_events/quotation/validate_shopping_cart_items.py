@@ -6,7 +6,7 @@ def execute(doc, method=None):
     if doc.order_type != "Shopping Cart":
         return
 
-    webshop_settings = frappe.get_cached_doc("Webstore Settings")
+    webshop_settings = frappe.get_cached_doc("Webshop Settings")
     for item in doc.items:
         has_web_item = frappe.db.exists("Website Item", {"item_code": item.item_code})
 

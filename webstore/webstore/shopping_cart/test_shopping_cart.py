@@ -174,7 +174,7 @@ class TestShoppingCart(unittest.TestCase):
 		self.remove_test_quotation(quotation)
 
 	@change_settings(
-		"Webstore Settings",
+		"Webshop Settings",
 		{
 			"company": "_Test Company",
 			"enabled": 1,
@@ -210,7 +210,7 @@ class TestShoppingCart(unittest.TestCase):
 		# test if items are rendered without error
 		frappe.render_template("templates/includes/cart/cart_items.html", cart)
 
-	@change_settings("Webstore Settings", {"save_quotations_as_draft": 1})
+	@change_settings("Webshop Settings", {"save_quotations_as_draft": 1})
 	def test_cart_without_checkout_and_draft_quotation(self):
 		"Test impact of 'save_quotations_as_draft' checkbox."
 		frappe.local.shopping_cart_settings = None
@@ -222,7 +222,7 @@ class TestShoppingCart(unittest.TestCase):
 
 		self.assertEqual(quote_doctstatus, 0)
 
-		frappe.db.set_single_value("Webstore Settings", "save_quotations_as_draft", 0)
+		frappe.db.set_single_value("Webshop Settings", "save_quotations_as_draft", 0)
 		frappe.local.shopping_cart_settings = None
 		update_cart("_Test Item", 1)
 		quote_name = request_for_quotation()  # Request for Quote
@@ -270,7 +270,7 @@ class TestShoppingCart(unittest.TestCase):
 
 	# helper functions
 	def enable_shopping_cart(self):
-		settings = frappe.get_doc("Webstore Settings")
+		settings = frappe.get_doc("Webshop Settings")
 
 		settings.update(
 			{
@@ -307,7 +307,7 @@ class TestShoppingCart(unittest.TestCase):
 		frappe.local.shopping_cart_settings = None
 
 	def disable_shopping_cart(self):
-		settings = frappe.get_doc("Webstore Settings")
+		settings = frappe.get_doc("Webshop Settings")
 		settings.enabled = 0
 		settings.save()
 		frappe.local.shopping_cart_settings = None
