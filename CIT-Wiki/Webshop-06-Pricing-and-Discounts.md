@@ -3,7 +3,7 @@
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [05 - Variant Selector](Webshop-05-Variant-Selector)  
 **Next:** [07 - Checkout & Orders](Webshop-07-Checkout-and-Orders)  
-**Source:** [Comfac Webshop Wiki - Chapter 06](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/06-Pricing-and-Discounts)
+**Source:** [Comfac Webstore Wiki - Chapter 06](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/06-Pricing-and-Discounts)
 
 ---
 

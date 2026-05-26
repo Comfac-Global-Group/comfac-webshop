@@ -13,10 +13,10 @@ on:
     - cron: "0 0 * * *"
 
 env:
-  WEBSHOP_BRANCH: ${{ github.base_ref || github.ref_name }}
+  WEBSTORE_BRANCH: ${{ github.base_ref || github.ref_name }}
 
 concurrency:
-  group: develop-webshop-${{ github.event.number }}
+  group: develop-webstore-${{ github.event.number }}
   cancel-in-progress: true
 
 jobs:
@@ -98,12 +98,12 @@ jobs:
         working-directory: /home/runner/frappe-bench
         run: |
           bench setup requirements --dev
-          bench get-app erpnext --branch $WEBSHOP_BRANCH
-          bench get-app payments --branch $WEBSHOP_BRANCH
+          bench get-app erpnext --branch $WEBSTORE_BRANCH
+          bench get-app payments --branch $WEBSTORE_BRANCH
           bench get-app $GITHUB_WORKSPACE
           bench new-site --db-root-password root --admin-password admin test_site
           bench --site test_site install-app erpnext
-          bench --site test_site install-app webshop
+          bench --site test_site install-app webstore
           bench build
         env:
           CI: 'Yes'
@@ -112,6 +112,6 @@ jobs:
         working-directory: /home/runner/frappe-bench
         run: |
           bench --site test_site set-config allow_tests true
-          bench --site test_site run-tests --app webshop
+          bench --site test_site run-tests --app webstore
         env:
           TYPE: server

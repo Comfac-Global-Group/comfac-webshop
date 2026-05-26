@@ -1,0 +1,136 @@
+{
+ "category": "Modules",
+ "charts": [],
+ "creation": "2026-05-23 18:00:00.000000",
+ "developer_mode_only": 0,
+ "disable_user_customization": 0,
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "extends": "",
+ "extends_another_page": 0,
+ "hide_custom": 0,
+ "icon": "cart",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "label": "Webstore",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Catalog",
+   "link_count": 0,
+   "link_to": "Website Item",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Website Items",
+   "link_count": 0,
+   "link_to": "Website Item",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Item Reviews",
+   "link_count": 0,
+   "link_to": "Item Review",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Wishlist",
+   "link_count": 0,
+   "link_to": "Wishlist",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Settings",
+   "link_count": 0,
+   "link_to": "Webstore Settings",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Webstore Settings",
+   "link_count": 0,
+   "link_to": "Webstore Settings",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "All Products",
+   "link_count": 0,
+   "link_to": "all-products",
+   "link_type": "URL",
+   "onboard": 1,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-05-23 18:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Webstore",
+ "name": "Webstore",
+ "number_groups": 0,
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "restrict_to_domain": "",
+ "roles": [],
+ "sequence_idx": 0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "format": "",
+   "icon": "cart",
+   "label": "Website Items",
+   "link_to": "Website Item",
+   "stats_filter": "[[\"published\",\"=\",1]]",
+   "type": "DocType",
+   "url": ""
+  },
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "format": "",
+   "icon": "shop",
+   "label": "Webstore Settings",
+   "link_to": "Webstore Settings",
+   "stats_filter": "",
+   "type": "DocType",
+   "url": ""
+  },
+  {
+   "color": "Grey",
+   "doc_view": "",
+   "format": "",
+   "icon": "website",
+   "label": "All Products",
+   "link_to": "all-products",
+   "stats_filter": "",
+   "type": "URL",
+   "url": ""
+  }
+ ],
+ "title": "Webstore"
+}

@@ -3,7 +3,7 @@
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [06 - Pricing & Discounts](Webshop-06-Pricing-and-Discounts)  
 **Next:** [08 - Templates & Frontend](Webshop-08-Templates-and-Frontend)  
-**Source:** [Comfac Webshop Wiki - Chapter 07](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/07-Checkout-and-Orders)
+**Source:** [Comfac Webstore Wiki - Chapter 07](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/07-Checkout-and-Orders)
 
 ---
 

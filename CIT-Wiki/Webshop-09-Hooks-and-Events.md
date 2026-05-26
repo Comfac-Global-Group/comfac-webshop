@@ -3,7 +3,7 @@
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [08 - Templates & Frontend](Webshop-08-Templates-and-Frontend)  
 **Next:** [10 - Feature Gap: Cart Discounts](Webshop-10-Feature-Gap-Cart-Discounts)  
-**Source:** [Comfac Webshop Wiki - Chapter 09](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/09-Hooks-and-Events)
+**Source:** [Comfac Webstore Wiki - Chapter 09](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/09-Hooks-and-Events)
 
 ---
 

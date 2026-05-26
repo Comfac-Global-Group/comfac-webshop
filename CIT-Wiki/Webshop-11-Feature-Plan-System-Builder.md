@@ -3,7 +3,7 @@
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [10 - Feature Gap: Cart Discounts](Webshop-10-Feature-Gap-Cart-Discounts)  
 **Next:** [12 - Staging Sandbox Deployment](Webshop-12-Staging-Sandbox-Deployment)  
-**Source:** [Comfac Webshop Wiki - Chapter 11](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/11-Feature-Plan-System-Builder)
+**Source:** [Comfac Webstore Wiki - Chapter 11](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/11-Feature-Plan-System-Builder)
 
 **Status:** 🔴 Not Implemented | **Priority:** High
 

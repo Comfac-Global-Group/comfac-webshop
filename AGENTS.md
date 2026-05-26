@@ -1,7 +1,7 @@
-# Comfac Webshop Agent Instructions
+# Comfac Webstore Agent Instructions
 
 > **For:** Kimi, Claude, DeepSeek, OpenCode, or any AI assistant  
-> **Repo:** `comfac-webshop` — web shop setup, product listings, pricing, and e-commerce configuration  
+> **Repo:** `comfac-webstore` — web shop setup, product listings, pricing, and e-commerce configuration  
 > **Last Updated:** 2026-05-23
 
 ---
@@ -74,7 +74,7 @@ Every **Friday**:
 
 ## Version Numbering Scheme
 
-cwp uses **semantic versioning** visible as `vMAJOR.MINOR.PATCH`:
+cws uses **semantic versioning** visible as `vMAJOR.MINOR.PATCH`:
 
 | Component | Meaning | Current |
 |-----------|---------|---------|
@@ -89,13 +89,13 @@ cwp uses **semantic versioning** visible as `vMAJOR.MINOR.PATCH`:
 - New features are MINOR increments
 - Production readiness (etest → ecit deploy) is MAJOR 1.0
 
-**Current version:** v0.1.01 — Initial cwp release on etest
+**Current version:** v0.1.01 — Initial cws release on etest
 
 **Last commit format:** `v0.1.01: <description>`
 
 ---
 
-## Upstream Sync (Updating cwp from fws)
+## Upstream Sync (Updating cws from fws)
 
 See **`UPSTREAM-SYNC.md`** for the step-by-step process. Short version:
 1. `git fetch upstream` (add remote if missing: `git remote add upstream https://github.com/frappe/webshop.git`)
@@ -108,17 +108,17 @@ See **`UPSTREAM-SYNC.md`** for the step-by-step process. Short version:
 
 ## CWP Core Principle (read before any change)
 
-> **cwp never adds new data sources. It only DISPLAYS information Frappe already provides
+> **cws never adds new data sources. It only DISPLAYS information Frappe already provides
 > on quotation/cart line items: `discount_percentage`, `price_list_rate`, `rate`, `amount`,
 > `taxes_and_charges`. The upstream fws already exposes all these fields.**
 
-Corollary: if a feature is missing or broken in cwp, the cause is **never** in cwp's templates.
+Corollary: if a feature is missing or broken in cws, the cause is **never** in cws's templates.
 Always look at:
 1. **Settings** — Webshop Settings not configured (most common)
 2. **Data** — pricing rule / discount not applied to the item
 3. **Assets** — CSS/JS bundle not built or not served
 
-The 5% cwp delta vs upstream fws:
+The 5% cws delta vs upstream fws:
 - `webshop/templates/includes/cart/cart_items.html` — discount row display
 - `webshop/templates/includes/cart/cart_items_dropdown.html` — mini-cart discount display
 - `webshop/hooks.py` — publisher info, `payments` removed from `required_apps`
@@ -126,7 +126,7 @@ The 5% cwp delta vs upstream fws:
 - `webshop/webshop/workspace/webshop.json` — workspace registration (new)
 - `VERSION` — version file (new)
 
-All SCSS/CSS is **100% upstream fws** — cwp does not add or change any stylesheets.
+All SCSS/CSS is **100% upstream fws** — cws does not add or change any stylesheets.
 
 ---
 
@@ -140,7 +140,7 @@ All SCSS/CSS is **100% upstream fws** — cwp does not add or change any stylesh
 | 4 | **Route smoke test** | `/all-products` → product page → `/cart` → Request for Quote |
 | 5 | **Discount visible** | Add a discounted item; verify strikethrough + badge + savings row |
 | 6 | **VAT applied** | Cart total includes tax row |
-| 7 | **fws feature parity** | Everything fws shows, cwp also shows |
+| 7 | **fws feature parity** | Everything fws shows, cws also shows |
 
 ### Webshop Settings — Required Fields on Both ecit and etest
 
@@ -172,16 +172,16 @@ hides all products from any visitor who is not logged in. Always verify this is 
 
 ---
 
-## 2026-05-23 — cwp Deployment & Current State
+## 2026-05-23 — cws Deployment & Current State
 
-**cwp (comfac-webshop-private)** is Comfac's private fork of Frappe WebShop (fws), deployed
+**cws (comfac-webstore-private)** is Comfac's private fork of Frappe WebShop (fws), deployed
 standalone on etest (t3.comfac-it.com). payments dependency removed. v0.1.01.
 
 ### etest State (as of 2026-05-23 end-of-day)
 
 | Signal | State |
 |--------|-------|
-| cwp installed for site | ✅ `test260204.s.frappe.cloud` |
+| cws installed for site | ✅ `test260204.s.frappe.cloud` |
 | `/all-products` | ✅ 200 |
 | 89 Website Items | ✅ Created via `make_website_item()` |
 | Add to Cart | ✅ QTN-CART-00001 created |
@@ -192,10 +192,10 @@ standalone on etest (t3.comfac-it.com). payments dependency removed. v0.1.01.
 | Awesome Bar | 🟡 Pending SSH `git pull` + `bench migrate` |
 | SSH access | 🔴 Blocked — "Too many authentication failures" |
 
-**Immediate blocker:** `payments` app is not in the etest bench. Installing cwp fails with
+**Immediate blocker:** `payments` app is not in the etest bench. Installing cws fails with
 `No module named 'payments'`. Resolve via Frappe Cloud dashboard (add payments app) or by removing
 the dependency from `hooks.py` if payments features are unused.
 
-**Next step:** Install cwp on etest bench, then run `create_website_items.py` (or a console script
+**Next step:** Install cws on etest bench, then run `create_website_items.py` (or a console script
 using `make_website_item()`) to create Website Item records from the 89 published Items. This
 completes the webshop layer on etest.

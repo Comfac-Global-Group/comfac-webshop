@@ -1,16 +1,16 @@
 # Webshop Index
 
 **Location:** Frappe ERPNext > Webshop  
-**Repository:** [Comfac-Global-Group/comfac-webshop](https://github.com/Comfac-Global-Group/comfac-webshop)  
+**Repository:** [Comfac-Global-Group/comfac-webstore](https://github.com/Comfac-Global-Group/comfac-webstore)  
 **Status:** Fork of Frappe Webshop with planned enhancements
 
 ---
 
 ## Overview
 
-The Comfac Webshop is an open-source e-commerce platform built on the Frappe Framework and integrated with ERPNext. It enables businesses to create online stores with product catalogs, shopping carts, and order management.
+The Comfac Webstore is an open-source e-commerce platform built on the Frappe Framework and integrated with ERPNext. It enables businesses to create online stores with product catalogs, shopping carts, and order management.
 
-This documentation covers the complete architecture, codebase, and planned enhancements for the Comfac Webshop fork.
+This documentation covers the complete architecture, codebase, and planned enhancements for the Comfac Webstore fork.
 
 ### Key Information
 
@@ -173,7 +173,7 @@ No way to configure multi-component systems (servers, desktops, maker kits) with
 **Before ANY feature work:**
 
 1. Clone production ERPNext instance to staging
-2. Install comfac-webshop fork on staging
+2. Install comfac-webstore fork on staging
 3. Validate seamless replacement:
    - Site loads without errors
    - Product listing works
@@ -237,16 +237,16 @@ The ERPNext pricing engine does all calculations.
 
 ### Code & Documentation
 
-- [GitHub Repository](https://github.com/Comfac-Global-Group/comfac-webshop)
+- [GitHub Repository](https://github.com/Comfac-Global-Group/comfac-webstore)
 - [Base Project: Frappe Webshop](https://github.com/frappe/webshop)
 - [ERPNext E-commerce Docs](https://docs.erpnext.com/docs/user/manual/en/set_up_e_commerce)
 - [Frappe Framework Docs](https://docs.frappe.io)
 
 ### Internal Documentation
 
-- [ANALYSIS.md](https://github.com/Comfac-Global-Group/comfac-webshop/blob/main/ANALYSIS.md) - Full technical analysis with all wiki chapters
-- [PRD.md](https://github.com/Comfac-Global-Group/comfac-webshop/blob/main/PRD.md) - Product requirements document
-- [Home.md](https://github.com/Comfac-Global-Group/comfac-webshop/blob/main/Home.md) - Repository navigation hub
+- [ANALYSIS.md](https://github.com/Comfac-Global-Group/comfac-webstore/blob/main/ANALYSIS.md) - Full technical analysis with all wiki chapters
+- [PRD.md](https://github.com/Comfac-Global-Group/comfac-webstore/blob/main/PRD.md) - Product requirements document
+- [Home.md](https://github.com/Comfac-Global-Group/comfac-webstore/blob/main/Home.md) - Repository navigation hub
 
 ---
 

@@ -3,7 +3,7 @@
 **Owner:** Justin Aquino / Comfac IT Team  
 **Last updated:** 2026-05-23  
 **Repos:**
-- `work/comfac-webshop/` — Frappe Webshop fork (private)
+- `work/comfac-webstore/` — Frappe Webshop fork (private)
 - `work/comfac-cart/comfac_cart/` — custom cart Frappe app (private)
 
 ---
@@ -14,7 +14,7 @@
 |------|--------|--------|----------|
 | DPA/NPC disclaimer on webshop & websites | 🔴 Not started | 1–2 days | High |
 | Merge comfac_cart into webshop | 🔴 Research needed | 3–5 days | Medium |
-| Consolidate `payments` app into cwp (backlog) | 🔴 Backlog — blocked on cwp stability | 5–7 days | Medium |
+| Consolidate `payments` app into cws (backlog) | 🔴 Backlog — blocked on cws stability | 5–7 days | Medium |
 
 ---
 
@@ -110,7 +110,7 @@ The National Privacy Commission (NPC) can impose penalties for non-compliance. C
 ### Background
 
 There are currently two separate private Frappe apps:
-1. **`comfac-webshop`** (`work/comfac-webshop/`) — fork of Frappe Webshop with Comfac customizations
+1. **`comfac-webstore`** (`work/comfac-webstore/`) — fork of Frappe Webshop with Comfac customizations
 2. **`comfac_cart`** (`work/comfac-cart/comfac_cart/`) — custom Frappe app with cart-specific logic
 
 Running two Frappe apps that both touch cart/checkout introduces:
@@ -121,7 +121,7 @@ Running two Frappe apps that both touch cart/checkout introduces:
 
 ### Goal
 
-Merge the custom cart logic from `comfac_cart` into `comfac-webshop` so there is **one app** to install. Keep all functionality; remove the duplication.
+Merge the custom cart logic from `comfac_cart` into `comfac-webstore` so there is **one app** to install. Keep all functionality; remove the duplication.
 
 ### Research Phase (Do This First)
 
@@ -139,16 +139,16 @@ find work/comfac-cart/ -name "*.html" -o -name "*.js" | head -20
 find work/comfac-cart/comfac_cart/ -name "*.py" | grep -v __init__
 ```
 
-**Step 2 — Audit `comfac-webshop`:**
+**Step 2 — Audit `comfac-webstore`:**
 ```bash
 # Check hooks
-cat work/comfac-webshop/hooks.py
+cat work/comfac-webstore/hooks.py
 
 # Check what templates/JS it provides
-find work/comfac-webshop/ -name "*.html" -o -name "*.js" | head -30
+find work/comfac-webstore/ -name "*.html" -o -name "*.js" | head -30
 
 # Check Python logic
-find work/comfac-webshop/webshop/ -name "*.py" | head -20
+find work/comfac-webstore/webshop/ -name "*.py" | head -20
 ```
 
 **Step 3 — Identify overlap and unique additions:**
@@ -157,7 +157,7 @@ find work/comfac-webshop/webshop/ -name "*.py" | head -20
 
 ### Migration Plan (After Audit)
 
-1. Copy all unique `comfac_cart` code into the equivalent location in `comfac-webshop`
+1. Copy all unique `comfac_cart` code into the equivalent location in `comfac-webstore`
 2. Merge hook registrations (check for duplicates, resolve ordering conflicts)
 3. Test on `etest` (`t3.comfac-it.com`) — do not test on `ecit` production
 4. Once verified on etest, remove `comfac_cart` app from the ERPNext instance
@@ -166,18 +166,18 @@ find work/comfac-webshop/webshop/ -name "*.py" | head -20
 ### Intern Tasks
 
 - [ ] **DEV-002-A:** Audit `comfac_cart/hooks.py` — list every hook and what it does
-- [ ] **DEV-002-B:** Audit `comfac-webshop/hooks.py` — list every hook and what it does
+- [ ] **DEV-002-B:** Audit `comfac-webstore/hooks.py` — list every hook and what it does
 - [ ] **DEV-002-C:** Find all Python files in `comfac_cart` — list their purpose
 - [ ] **DEV-002-D:** Find all HTML/JS template overrides in `comfac_cart`
-- [ ] **DEV-002-E:** Write a gap analysis table: what `comfac_cart` adds that `comfac-webshop` lacks
+- [ ] **DEV-002-E:** Write a gap analysis table: what `comfac_cart` adds that `comfac-webstore` lacks
 - [ ] **DEV-002-F:** Present gap analysis to Justin for merge decision
-- [ ] **DEV-002-G:** (After approval) Copy unique files into `comfac-webshop` with clear commit messages
+- [ ] **DEV-002-G:** (After approval) Copy unique files into `comfac-webstore` with clear commit messages
 - [ ] **DEV-002-H:** Test on `etest` — walk through full cart → checkout → order flow
 - [ ] **DEV-002-I:** Deploy merged app to `ecit` — remove `comfac_cart` — verify no regressions
 
 ### Acceptance Criteria
 - [ ] Gap analysis documented and reviewed
-- [ ] Merged `comfac-webshop` passes full checkout flow on etest
+- [ ] Merged `comfac-webstore` passes full checkout flow on etest
 - [ ] No regression on `ecit` webshop after deploying merged app
 - [ ] `comfac_cart` app uninstalled from all ERPNext instances
 - [ ] `work/comfac-cart/` moved to `work/backlog/comfac-cart/`
@@ -186,36 +186,36 @@ find work/comfac-webshop/webshop/ -name "*.py" | head -20
 
 ---
 
-## DEV-003 — Consolidate Frappe Payments into comfac-webshop (Backlog)
+## DEV-003 — Consolidate Frappe Payments into comfac-webstore (Backlog)
 
 **Priority:** Medium  
 **Owner:** Justin / Senior developer  
-**Estimated:** 5–7 days (after cwp is stable)  
-**Status:** 🔴 **Backlog — DO NOT START until cwp is fully working**
+**Estimated:** 5–7 days (after cws is stable)  
+**Status:** 🔴 **Backlog — DO NOT START until cws is fully working**
 
 ### Background
 
-Frappe Webshop (`cwp`) currently has:
+Frappe Webshop (`cws`) currently has:
 ```python
 required_apps = ["payments", "erpnext"]
 ```
 
-This means every ERPNext instance that runs the webshop must also install the separate `payments` Frappe app. We have decided **not to install `payments` as a standalone app** on any Comfac ERPNext instance. Instead, all payment gateway logic will be absorbed into `cwp` so that `cwp` is a single, self-contained app.
+This means every ERPNext instance that runs the webshop must also install the separate `payments` Frappe app. We have decided **not to install `payments` as a standalone app** on any Comfac ERPNext instance. Instead, all payment gateway logic will be absorbed into `cws` so that `cws` is a single, self-contained app.
 
 ### Goal
 
-Merge the entire `frappe/payments` codebase into `comfac-webshop` so that:
-1. `cwp` provides **webshop + payments** in one install
+Merge the entire `frappe/payments` codebase into `comfac-webstore` so that:
+1. `cws` provides **webshop + payments** in one install
 2. `required_apps = ["erpnext"]` only
 3. No separate `payments` app needed on `ecit`, `etest`, or `egitb`
 
 ### Pre-condition (Hard Blocker)
 
-**cwp MUST be fully working before starting DEV-003.** This means:
+**cws MUST be fully working before starting DEV-003.** This means:
 - [ ] Cart → checkout → order flow works end-to-end on `etest`
 - [ ] Tax calculation displays correctly in cart (EXP-018 resolved)
 - [ ] Discounts display correctly in cart (EXP-019 resolved and deployed)
-- [ ] `comfac_cart` merged into `cwp` (DEV-002 complete)
+- [ ] `comfac_cart` merged into `cws` (DEV-002 complete)
 - [ ] DPA/NPC compliance notice on checkout (DEV-001 complete)
 
 ### Consolidation Plan (High Level)
@@ -224,37 +224,37 @@ Merge the entire `frappe/payments` codebase into `comfac-webshop` so that:
 - [ ] Clone `github.com/frappe/payments` (already done: `work/payments/`)
 - [ ] Identify which gateways Comfac actually needs (likely: Stripe, PayPal, Razorpay)
 - [ ] Prune unused gateways (Mpesa, Paytm, Paymob, GoCardless, Braintree) if not needed
-- [ ] Evaluate Web Form payment override — drop if cwp doesn't use Web Form payments
+- [ ] Evaluate Web Form payment override — drop if cws doesn't use Web Form payments
 
 **Phase 2 — Namespace Migration**
-- [ ] Copy remaining DocTypes (JSON + Python controllers) into `cwp` module
-- [ ] Migrate website checkout pages (`templates/pages/*`) into `cwp/templates/`
-- [ ] Migrate public JS assets into `cwp/public/js/`
+- [ ] Copy remaining DocTypes (JSON + Python controllers) into `cws` module
+- [ ] Migrate website checkout pages (`templates/pages/*`) into `cws/templates/`
+- [ ] Migrate public JS assets into `cws/public/js/`
 - [ ] Replace all `payments.` imports with `webshop.` namespace
 - [ ] Update whitelisted method paths from `payments.payment_gateways...` to `webshop...`
 
 **Phase 3 — Hooks Integration**
-- [ ] Merge `payments` hooks into `cwp/hooks.py`:
+- [ ] Merge `payments` hooks into `cws/hooks.py`:
   - `after_install` / `before_uninstall` (custom fields)
   - `scheduler_events` (Razorpay capture)
   - `extend_doctype_class` (Web Form — if kept)
   - `override_whitelisted_methods` (Web Form accept)
-- [ ] Merge Python dependencies into `cwp/pyproject.toml`
+- [ ] Merge Python dependencies into `cws/pyproject.toml`
 
 **Phase 4 — Payment Request Compatibility**
-- [ ] Ensure `cwp`'s existing `PaymentRequest` override works with migrated gateway controllers
+- [ ] Ensure `cws`'s existing `PaymentRequest` override works with migrated gateway controllers
 - [ ] Verify `on_payment_authorized` contract is satisfied for each gateway
 - [ ] Test checkout → payment → order completion on `etest`
 
 **Phase 5 — Cleanup**
 - [ ] Uninstall `payments` app from `etest`
-- [ ] Verify `cwp` alone handles webshop + payments
+- [ ] Verify `cws` alone handles webshop + payments
 - [ ] Deploy to `ecit`
 - [ ] Archive `work/payments/` or keep as reference
 
 ### Acceptance Criteria
 - [ ] `payments` app is **not installed** on any Comfac ERPNext instance
-- [ ] `cwp` installs and runs with `required_apps = ["erpnext"]` only
+- [ ] `cws` installs and runs with `required_apps = ["erpnext"]` only
 - [ ] Stripe / PayPal / Razorpay checkout flows work end-to-end on `etest`
 - [ ] No regression in existing webshop functionality
 - [ ] All gateway callbacks and webhooks function correctly under `webshop.` namespace
@@ -262,16 +262,16 @@ Merge the entire `frappe/payments` codebase into `comfac-webshop` so that:
 ### Reference
 - Frappe Payments repo (cloned): `work/payments/`
 - Deep analysis of payments app: see session log `work/comfac-erpnext/260504-150305-erpnext-log.md` → 2026-05-23 entry
-- `cwp` hooks.py: `work/comfac-webshop/webshop/hooks.py`
-- `cwp` pyproject.toml: `work/comfac-webshop/pyproject.toml`
+- `cws` hooks.py: `work/comfac-webstore/webshop/hooks.py`
+- `cws` pyproject.toml: `work/comfac-webstore/pyproject.toml`
 
 ---
 
 ## Related Files
 
-- Webshop wiki: `work/comfac-webshop/CIT-Wiki/`
-- Webshop PRD: `work/comfac-webshop/PRD.md`
-- Webshop analysis: `work/comfac-webshop/ANALYSIS.md`
+- Webshop wiki: `work/comfac-webstore/CIT-Wiki/`
+- Webshop PRD: `work/comfac-webstore/PRD.md`
+- Webshop analysis: `work/comfac-webstore/ANALYSIS.md`
 - Comfac Data Privacy Manual: `work/comfac-marketing-sales/251015 (Draft) Comfac Data Privacy Manual_signed.pdf`
 - Marketing Privacy Policy: `work/comfac-marketing-sales/260521 Marketing Data Privacy Policy.docx`
 - ERPNext test instance (etest): `t3.comfac-it.com` — credentials in `agent260222/.brc/ERPNext etest`

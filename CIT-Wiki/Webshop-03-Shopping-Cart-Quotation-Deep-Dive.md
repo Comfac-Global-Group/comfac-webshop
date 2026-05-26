@@ -3,7 +3,7 @@
 **Parent:** [Webshop Index](Webshop-Index)  
 **Previous:** [02 - DocTypes](Webshop-02-DocTypes)  
 **Next:** [04 - Product Pages & Browsing](Webshop-04-Product-Pages-and-Browsing)  
-**Source:** [Comfac Webshop Wiki - Chapter 03](https://github.com/Comfac-Global-Group/comfac-webshop/wiki/03-Shopping-Cart-Quotation-Deep-Dive)
+**Source:** [Comfac Webstore Wiki - Chapter 03](https://github.com/Comfac-Global-Group/comfac-webstore/wiki/03-Shopping-Cart-Quotation-Deep-Dive)
 
 ---
 
