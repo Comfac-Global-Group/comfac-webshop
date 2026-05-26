@@ -1,10 +1,9 @@
-# Webshop + comfac_cart Development Backlog
+# WebStore Development Backlog
 
 **Owner:** Justin Aquino / Comfac IT Team  
 **Last updated:** 2026-05-23  
 **Repos:**
-- `work/comfac-webstore/` — Frappe Webshop fork (private)
-- `work/comfac-cart/comfac_cart/` — custom cart Frappe app (private)
+- `work/comfac-webstore/` — Comfac WebStore (private fork of Frappe WebShop, renamed from comfac-webshop)
 
 ---
 
@@ -13,7 +12,7 @@
 | Item | Status | Effort | Priority |
 |------|--------|--------|----------|
 | DPA/NPC disclaimer on webshop & websites | 🔴 Not started | 1–2 days | High |
-| Merge comfac_cart into webshop | 🔴 Research needed | 3–5 days | Medium |
+| ~~Merge comfac_cart into webshop~~ | ✅ Done — `comfac-cart` deleted, all functionality in `webstore` | — | — |
 | Consolidate `payments` app into cws (backlog) | 🔴 Backlog — blocked on cws stability | 5–7 days | Medium |
 
 ---
@@ -111,7 +110,7 @@ The National Privacy Commission (NPC) can impose penalties for non-compliance. C
 
 There are currently two separate private Frappe apps:
 1. **`comfac-webstore`** (`work/comfac-webstore/`) — fork of Frappe Webshop with Comfac customizations
-2. **`comfac_cart`** (`work/comfac-cart/comfac_cart/`) — custom Frappe app with cart-specific logic
+2. ~~**`comfac_cart`** (`work/comfac-cart/comfac_cart/`)~~ — **DELETED 2026-05-26**. Functionality merged into `webstore`.
 
 Running two Frappe apps that both touch cart/checkout introduces:
 - Maintenance overhead (two repos, two update cycles)
@@ -127,16 +126,14 @@ Merge the custom cart logic from `comfac_cart` into `comfac-webstore` so there i
 
 Before merging, an intern/developer must audit what each app does:
 
-**Step 1 — Audit `comfac_cart`:**
+**Step 1 — ~~Audit `comfac_cart`~~ (ARCHIVED 2026-05-26):**
+`comfac-cart` has been deleted. All cart functionality now lives in `webstore`.
+Historical audit commands (repo no longer exists):
 ```bash
-# Check what hooks comfac_cart registers
-cat work/comfac-cart/comfac_cart/hooks.py
-
-# Check what templates/JS it provides
-find work/comfac-cart/ -name "*.html" -o -name "*.js" | head -20
-
-# Check what Python logic it contains
-find work/comfac-cart/comfac_cart/ -name "*.py" | grep -v __init__
+# These commands reference the deleted comfac-cart repo:
+# cat work/comfac-cart/comfac_cart/hooks.py
+# find work/comfac-cart/ -name "*.html" -o -name "*.js" | head -20
+# find work/comfac-cart/comfac_cart/ -name "*.py" | grep -v __init__
 ```
 
 **Step 2 — Audit `comfac-webstore`:**
@@ -161,7 +158,7 @@ find work/comfac-webstore/webshop/ -name "*.py" | head -20
 2. Merge hook registrations (check for duplicates, resolve ordering conflicts)
 3. Test on `etest` (`t3.comfac-it.com`) — do not test on `ecit` production
 4. Once verified on etest, remove `comfac_cart` app from the ERPNext instance
-5. Archive `work/comfac-cart/` to `work/backlog/comfac-cart/`
+5. ~~Archive `work/comfac-cart/` to `work/backlog/comfac-cart/`~~ — **DONE 2026-05-26**: `comfac-cart` deleted. `webstore` now handles all cart functionality.
 
 ### Intern Tasks
 
@@ -180,7 +177,7 @@ find work/comfac-webstore/webshop/ -name "*.py" | head -20
 - [ ] Merged `comfac-webstore` passes full checkout flow on etest
 - [ ] No regression on `ecit` webshop after deploying merged app
 - [ ] `comfac_cart` app uninstalled from all ERPNext instances
-- [ ] `work/comfac-cart/` moved to `work/backlog/comfac-cart/`
+- [x] `work/comfac-cart/` deleted (superseded by `webstore`)
 
 ---
 
