@@ -19,7 +19,7 @@ class ShoppingCartSetupError(frappe.ValidationError):
 	pass
 
 
-class WebstoreSettings(Document):
+class WebshopSettings(Document):
 	def onload(self):
 		self.get("__onload").quotation_series = frappe.get_meta("Quotation").get_options("naming_series")
 

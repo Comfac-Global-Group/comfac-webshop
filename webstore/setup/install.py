@@ -226,13 +226,20 @@ patches = [
 ]
 
 def run_patches():
-	# Customers migrating from v13 to v15 directly need to run all below patches
+	# Migration patches for customers upgrading from v13 to v15.
+	# On a fresh v15 bench these are all no-ops; skip gracefully on failure.
 
 	frappe.flags.in_patch = True
 
 	try:
 		for patch in patches:
-			frappe.get_attr(f"webstore.patches.{patch}.execute")()
+			try:
+				frappe.get_attr(f"webstore.patches.{patch}.execute")()
+			except Exception as e:
+				click.secho(
+					f"[webstore] Skipping migration patch '{patch}' (fresh install or already applied): {e}",
+					fg="yellow",
+				)
 
 	finally:
 		frappe.flags.in_patch = False

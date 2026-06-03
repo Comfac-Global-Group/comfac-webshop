@@ -9,7 +9,7 @@ from webstore.webstore.doctype.webshop_settings.webshop_settings import (
 )
 
 
-class TestWebstoreSettings(unittest.TestCase):
+class TestWebshopSettings(unittest.TestCase):
 	def tearDown(self):
 		frappe.db.rollback()
 
